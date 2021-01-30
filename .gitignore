@@ -1,0 +1,6 @@
+.emacs.desktop*
+.mc-lists.el
+elpa
+eshell
+transient
+url
