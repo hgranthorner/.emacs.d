@@ -4,3 +4,5 @@ elpa
 eshell
 transient
 url
+auto-save-list
+server
