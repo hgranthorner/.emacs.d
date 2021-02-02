@@ -27,6 +27,8 @@
 ;; Font
 (if is-windows
     (set-frame-font "Consolas 17" nil t))
+(if is-mac
+    (set-face-attribute 'default nil :height 130))
 
 ;; Sensible startup
 (setq mac-command-modifier 'control)
@@ -46,6 +48,8 @@
 
 (if is-windows
     (setq default-directory "C:/Users/Grant/Dev/"))
+(if is-mac
+    (setq default-directory "~/"))
 (setq org-todo-keywords
       '((sequence "TODO" "WAITING" "IN PROGRESS" "|" "DONE" "DELEGATED")))
 
