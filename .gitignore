@@ -7,4 +7,5 @@ url
 auto-save-list
 server
 straight
-projectile-bookmarks.eld
+projectile*
+recentf
