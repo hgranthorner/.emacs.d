@@ -24,14 +24,6 @@
 (setq is-mac (equal system-type 'darwin))
 (setq is-windows (equal system-type 'windows-nt))
 
-;; Initialize use package
-;; (unless (package-installed-p 'use-package)
-;;   (package-refresh-contents)
-;;   (package-install 'use-package))
-;; (eval-when-compile
-;;   (require 'use-package))
-;; (setq use-package-always-ensure t)
-
 (use-package diminish
   :init
   (diminish 'auto-revert-mode)
@@ -54,7 +46,7 @@
 (menu-bar-mode -1)
 (toggle-scroll-bar -1)
 (tool-bar-mode -1)
-(global-linum-mode 1)
+(display-line-numbers-mode 1)
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 (setq-default indent-tabs-mode nil)
 (desktop-save-mode 1)
@@ -95,7 +87,10 @@
 (use-package browse-kill-ring)
 
 ;; Org mode
-(setq org-support-shift-select 1)
+(use-package org
+  :init
+  (setq org-support-shift-select 1))
+
 
 ;; Autocomplete brackets
 (electric-pair-mode 1)
@@ -150,7 +145,10 @@
 ;; Ivy
 (use-package counsel
   :diminish
+  :defer f
   :after ivy
+  :init
+  (setq ivy-initial-inputs-alist nil)
   :config (counsel-mode)
   :bind (("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
@@ -185,22 +183,6 @@
   :bind (:map projectile-mode-map
               ("s-p" . projectile-command-map)
               ("C-c p" . projectile-command-map)))
-
-;; yasnippet
-(use-package yasnippet
-  :config
-  (yas-global-mode t)
-  (define-key yas-minor-mode-map (kbd "<tab>") nil)
-  (define-key yas-minor-mode-map (kbd "C-'") #'yas-expand)
-  (yas-reload-all)
-  (setq yas-snippet-dirs
-      '("~/.emacs.d/snippets"))
-  (setq yas-prompt-functions '(yas-ido-prompt))
-  (defun help/yas-after-exit-snippet-hook-fn ()
-    (prettify-symbols-mode)
-    (prettify-symbols-mode))
-  (add-hook 'yas-after-exit-snippet-hook #'help/yas-after-exit-snippet-hook-fn)
-  :diminish yas-minor-mode)
 
 ;; Fix c indentation
 (defun fix-c-indent-offset-according-to-syntax-context (key val)
