@@ -172,23 +172,28 @@
          ("C-c g" . counsel-git)
          ("C-c k" . counsel-ag)
          ("C-x l" . counsel-locate)
-         ("C-c m" . counsel-mark-ring)))
+         ("C-c m" . counsel-mark-ring)
+         ("C-x x" . counsel-find-file)))
 
 (use-package ivy
   :defer 1
   :diminish
   :bind (("C-c C-r" . ivy-resume)
-         ("C-x B" . ivy-switch-buffer-other-window))
+         ("C-x C-x" . ivy-switch-buffer)
+         ("C-x M-x" . ivy-switch-buffer-other-window))
   :custom
   (ivy-count-format "(%d/%d) ")
   (ivy-use-virtual-buffers t)
   :config (ivy-mode))
 
+;; Ag
+(use-package ag)
+
 ;; Projectile
 (use-package projectile
-  :defer 1
   :diminish
   :config
+  (setq projectile-project-search-path '("~/repos/"))
   (setq projectile-switch-project-action 'projectile-dired)
   :init
   (projectile-mode +1)
