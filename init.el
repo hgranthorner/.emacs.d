@@ -55,7 +55,7 @@
 (menu-bar-mode -1)
 (toggle-scroll-bar -1)
 (tool-bar-mode -1)
-(display-line-numbers-mode 1)
+(global-display-line-numbers-mode 1)
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 (setq-default indent-tabs-mode nil)
 (desktop-save-mode 1)
