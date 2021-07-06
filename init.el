@@ -1,5 +1,14 @@
 (setq gc-cons-threshold (* 50 1000 1000))
 
+(defun display-startup-time ()
+  (message "Emacs loaded in %s with %d garbage collections."
+           (format "%.2f seconds"
+                   (float-time
+                     (time-subtract after-init-time before-init-time)))
+           gcs-done))
+
+(add-hook 'emacs-startup-hook #'display-startup-time)
+
 (defvar bootstrap-version)
 (let ((bootstrap-file
       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -88,6 +97,7 @@
 
 ;; Org mode
 (use-package org
+  :defer t
   :init
   (setq org-support-shift-select 1))
 
@@ -98,12 +108,14 @@
 (setq electric-pair-preserve-balance nil)
 
 ;; Theme
-(use-package zenburn-theme
+(use-package spacemacs-theme
+  :defer t
   :config
-  (load-theme 'zenburn t))
+  (load-theme 'spacemacs-dark t))
 
 ;; Multiple cursors
 (use-package multiple-cursors
+  :defer 2
   :bind
   ("C->" . 'mc/mark-next-like-this)
   ("C-<" . 'mc/mark-previous-like-this)
@@ -145,7 +157,6 @@
 ;; Ivy
 (use-package counsel
   :diminish
-  :defer f
   :after ivy
   :init
   (setq ivy-initial-inputs-alist nil)
@@ -164,7 +175,7 @@
          ("C-c m" . counsel-mark-ring)))
 
 (use-package ivy
-  :defer 0.1
+  :defer 1
   :diminish
   :bind (("C-c C-r" . ivy-resume)
          ("C-x B" . ivy-switch-buffer-other-window))
@@ -175,6 +186,7 @@
 
 ;; Projectile
 (use-package projectile
+  :defer 1
   :diminish
   :config
   (setq projectile-switch-project-action 'projectile-dired)
