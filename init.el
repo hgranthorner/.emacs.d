@@ -77,7 +77,6 @@
 (global-set-key (kbd "M-z") 'zap-up-to-char)
 (global-set-key (kbd "M-o") 'other-window)
 (global-set-key (kbd "C-c c") 'compile)
-(global-set-key (kbd "C-c s") 'sr-speedbar-toggle)
 (global-set-key (kbd "C-c y") 'browse-kill-ring)
 (global-set-key (kbd "M-s") 'isearch-forward-regexp)
 (global-set-key (kbd "M-r") 'isearch-backward-regexp)
@@ -120,6 +119,29 @@
   ("C->" . 'mc/mark-next-like-this)
   ("C-<" . 'mc/mark-previous-like-this)
   ("C-c C->" . 'mc/mark-all-like-this))
+
+;; String Inflection
+(defun my-string-inflection-cycle-auto ()
+    "switching by major-mode"
+    (interactive)
+    (cond
+     ;; for emacs-lisp-mode
+     ((eq major-mode 'emacs-lisp-mode)
+      (string-inflection-all-cycle))
+     ;; for python
+     ((eq major-mode 'python-mode)
+      (string-inflection-python-style-cycle))
+     ;; for java
+     ((eq major-mode 'java-mode)
+      (string-inflection-java-style-cycle))
+     (t
+      ;; default
+      (string-inflection-ruby-style-cycle))))
+
+(use-package string-inflection
+  :config
+  (global-unset-key (kbd "C-c s"))
+  (global-set-key (kbd "C-c s") 'my-string-inflection-cycle-auto))
 
 ;; Magit
 (use-package magit
