@@ -209,6 +209,11 @@
   (ivy-use-virtual-buffers t)
   :config (ivy-mode))
 
+(use-package ivy-rich
+  :after ivy
+  :init
+  (ivy-rich-mode 1))
+
 ;; Ag
 (use-package ag)
 
@@ -222,7 +227,8 @@
   (projectile-mode +1)
   :bind (:map projectile-mode-map
               ("s-p" . projectile-command-map)
-              ("C-c p" . projectile-command-map)))
+              ("C-c p" . projectile-command-map)
+              ("<f5>" . projectile-test-project)))
 
 ;; Fix c indentation
 (defun fix-c-indent-offset-according-to-syntax-context (key val)
@@ -243,11 +249,13 @@
   :config
   (setq typescript-indent-level 2))
 
+(setq js-indent-level 2)
+
 (use-package web-mode
   :mode (("\\.html?\\'" . web-mode)
          ("\\.tsx\\'" . web-mode)
          ("\\.jsx\\'" . web-mode))
-  :config
+  :init
   (setq web-mode-markup-indent-offset 2
         web-mode-css-indent-offset 2
         web-mode-code-indent-offset 2
@@ -259,7 +267,6 @@
         web-mode-enable-comment-keywords t
         web-mode-enable-current-element-highlight t
 	web-mode-enable-auto-indentation nil
-        js-indent-level 2
         ))
 
 (use-package emmet-mode
