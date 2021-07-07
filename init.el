@@ -35,8 +35,9 @@
 
 (use-package diminish
   :init
-  (diminish 'auto-revert-mode)
-  (diminish 'eldoc-mode))
+  :diminish auto-revert-mode
+  :diminish eldoc-mode
+  )
 
 ;; Font
 (if is-windows
@@ -234,6 +235,7 @@
 
 ;; Flycheck
 (use-package flycheck
+  :diminish
   :init (global-flycheck-mode))
 
 ;; Typescript
