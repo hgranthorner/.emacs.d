@@ -236,9 +236,6 @@
   (setq c-offsets-alist (delq (assoc key c-offsets-alist) c-offsets-alist))
   (add-to-list 'c-offsets-alist '(key . val)))
 
-;; Vterm
-(use-package vterm)
-
 ;; Flycheck
 (use-package flycheck
   :diminish
