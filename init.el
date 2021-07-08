@@ -240,10 +240,38 @@
 (use-package csv-mode
   :defer t)
 
+;; SQL
+(defun sql-copy-results-to-buffer ()
+  "Pull the most recent query results into the end of a buffer named 'results."
+  (interactive)
+  (goto-char (point-max))
+  (isearch-backward nil 1)
+  (isearch-yank-string "> +")
+  (isearch-exit)
+  (forward-char 2)
+  (set-mark-command nil)
+  (isearch-forward nil 1)
+  (isearch-yank-string "sec)")
+  (isearch-exit)
+  (call-interactively #'kill-ring-save)
+  (switch-to-buffer "results")
+  (goto-char (point-max))
+  (newline)
+  (newline)
+  (yank))
+
 ;; Flycheck
 (use-package flycheck
   :diminish
   :init (global-flycheck-mode))
+
+;; Company
+(use-package company
+  :init
+  (setq company-idle-delay 0.0)
+  (setq company-dabbrev-downcase nil)
+  :config
+  (global-company-mode t))
 
 ;; Typescript
 (use-package typescript-mode
