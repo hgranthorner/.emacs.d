@@ -239,6 +239,10 @@
 ;; Vterm
 (use-package vterm)
 
+;; CSV mode
+(use-package csv-mode
+  :defer t)
+
 ;; Flycheck
 (use-package flycheck
   :diminish
