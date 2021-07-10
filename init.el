@@ -271,6 +271,7 @@
 
 ;; Company
 (use-package company
+  :diminish
   :init
   (setq company-idle-delay 0.0)
   (setq company-dabbrev-downcase nil)
