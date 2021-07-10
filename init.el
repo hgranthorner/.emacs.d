@@ -215,7 +215,7 @@
 
 (use-package ivy-rich
   :after ivy
-  :init
+  :config
   (ivy-rich-mode 1))
 
 ;; Ag
