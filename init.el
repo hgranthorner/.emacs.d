@@ -197,6 +197,8 @@
          ("C-c k" . counsel-ag)
          ("C-x l" . counsel-locate)
          ("C-c m" . counsel-mark-ring)
+         ("C-x C-x" . counsel-switch-buffer)
+         ("C-x M-x" . counsel-switch-buffer-other-window)
          ("C-x x" . counsel-find-file)))
 
 (use-package ivy
@@ -205,9 +207,7 @@
   :init
   (setq ivy-re-builders-alist
       '((t . ivy--regex-ignore-order)))
-  :bind (("C-c C-r" . ivy-resume)
-         ("C-x C-x" . ivy-switch-buffer)
-         ("C-x M-x" . ivy-switch-buffer-other-window))
+  :bind ("C-c C-r" . ivy-resume)
   :custom
   (ivy-count-format "(%d/%d) ")
   (ivy-use-virtual-buffers t)
