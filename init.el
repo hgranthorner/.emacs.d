@@ -141,6 +141,7 @@
       (string-inflection-ruby-style-cycle))))
 
 (use-package string-inflection
+  :defer 1
   :config
   (global-unset-key (kbd "C-c s"))
   (global-set-key (kbd "C-c s") 'my-string-inflection-cycle-auto))
@@ -278,12 +279,14 @@
 
 ;; Typescript
 (use-package typescript-mode
+  :defer t
   :config
   (setq typescript-indent-level 2))
 
 (setq js-indent-level 2)
 
 (use-package web-mode
+  :defer t
   :mode (("\\.html?\\'" . web-mode)
          ("\\.tsx\\'" . web-mode)
          ("\\.jsx\\'" . web-mode))
@@ -302,13 +305,19 @@
         ))
 
 (use-package emmet-mode
+  :defer t
   :commands emmet-mode
   :config
   (add-hook 'web-mode-hook #'emmet-mode)
   (add-hook 'html-mode-hook #'emmet-mode))
 
 ;; Pug
-(use-package pug-mode)
+(use-package pug-mode
+  :defer t)
+
+;; Clojure/cider
+(use-package cider
+  :defer t)
 
 (setq gc-cons-threshold (* 2 1000 1000))
 
