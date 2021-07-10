@@ -63,7 +63,8 @@
 (delete-selection-mode)
 
 (if is-windows
-    (setq default-directory "C:/Users/Grant/Dev/"))
+  (setq default-directory "C:/Users/Grant/Dev/")
+  (setq projectile-project-search-path '("~/repos/")))
 (if is-mac
     (setq default-directory "~/"))
 (setq org-todo-keywords
@@ -201,6 +202,9 @@
 (use-package ivy
   :defer 1
   :diminish
+  :init
+  (setq ivy-re-builders-alist
+      '((t . ivy--regex-ignore-order)))
   :bind (("C-c C-r" . ivy-resume)
          ("C-x C-x" . ivy-switch-buffer)
          ("C-x M-x" . ivy-switch-buffer-other-window))
@@ -221,7 +225,6 @@
 (use-package projectile
   :diminish
   :config
-  (setq projectile-project-search-path '("~/repos/"))
   (setq projectile-switch-project-action 'projectile-dired)
   :init
   (projectile-mode +1)
