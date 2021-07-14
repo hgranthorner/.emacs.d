@@ -43,7 +43,7 @@
 (if is-windows
     (set-frame-font "Consolas 17" nil t))
 (if is-mac
-    (set-face-attribute 'default nil :height 160))
+    (set-face-attribute 'default nil :height 150))
 
 ;; Sensible startup
 (setq mac-command-modifier 'control)
@@ -77,7 +77,7 @@
 (global-set-key (kbd "M-p") 'backward-paragraph)
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (global-set-key (kbd "M-z") 'zap-up-to-char)
-(global-set-key (kbd "M-o") 'other-window)
+; (global-set-key (kbd "M-o") 'other-window)
 (global-set-key (kbd "C-c c") 'compile)
 (global-set-key (kbd "C-c y") 'browse-kill-ring)
 (global-set-key (kbd "M-s") 'isearch-forward-regexp)
@@ -155,8 +155,16 @@
   :diminish
   :config (which-key-mode))
 
+;; Ace Window
+(use-package ace-window
+  :init
+  (setq aw-keys '(?t ?s ?r ?a ?n ?e ?i ?o))
+  :bind
+  ("M-o" . 'ace-window))
+
 ;; yasnippet
 (use-package yasnippet
+  :defer t
   :config
   (yas-global-mode t)
   (define-key yas-minor-mode-map (kbd "<tab>") nil)
@@ -334,3 +342,4 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+(put 'narrow-to-region 'disabled nil)
