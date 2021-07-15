@@ -43,7 +43,8 @@
 (if is-windows
     (set-frame-font "Consolas 17" nil t))
 (if is-mac
-    (set-face-attribute 'default nil :height 150))
+    (set-face-attribute 'default nil :height 150)
+    (setq dired-use-ls-dired nil))
 
 ;; Sensible startup
 (setq mac-command-modifier 'control)
