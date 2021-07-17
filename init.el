@@ -4,20 +4,20 @@
   (message "Emacs loaded in %s with %d garbage collections."
            (format "%.2f seconds"
                    (float-time
-                     (time-subtract after-init-time before-init-time)))
+                    (time-subtract after-init-time before-init-time)))
            gcs-done))
 
 (add-hook 'emacs-startup-hook #'display-startup-time)
 
 (defvar bootstrap-version)
 (let ((bootstrap-file
-      (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
       (bootstrap-version 5))
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer
         (url-retrieve-synchronously
-        "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-        'silent 'inhibit-cookies)
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
@@ -43,8 +43,11 @@
 (if is-windows
     (set-frame-font "Consolas 17" nil t))
 (if is-mac
-    (set-face-attribute 'default nil :height 150)
-    (setq dired-use-ls-dired nil))
+    (use-package exec-path-from-shell
+      :init
+      (exec-path-from-shell-initialize))
+  (set-face-attribute 'default nil :height 150)
+  (setq dired-use-ls-dired nil))
 
 ;; Sensible startup
 (setq mac-command-modifier 'control)
@@ -64,10 +67,11 @@
 (delete-selection-mode)
 
 (if is-windows
-  (setq default-directory "C:/Users/Grant/Dev/")
-  (setq projectile-project-search-path '("~/repos/")))
+  (setq default-directory "C:/Users/Grant/Dev/"))
 (if is-mac
-    (setq default-directory "~/"))
+    (setq default-directory "~/")
+  ; (setq projectile-project-search-path '("~/repos/")))
+    (setq projectile-project-search-path '("~/Dev/")))
 (setq org-todo-keywords
       '((sequence "TODO" "WAITING" "IN PROGRESS" "|" "DONE" "DELEGATED")))
 
@@ -78,7 +82,7 @@
 (global-set-key (kbd "M-p") 'backward-paragraph)
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (global-set-key (kbd "M-z") 'zap-up-to-char)
-; (global-set-key (kbd "M-o") 'other-window)
+                                        ; (global-set-key (kbd "M-o") 'other-window)
 (global-set-key (kbd "C-c c") 'compile)
 (global-set-key (kbd "C-c y") 'browse-kill-ring)
 (global-set-key (kbd "M-s") 'isearch-forward-regexp)
@@ -125,21 +129,21 @@
 
 ;; String Inflection
 (defun my-string-inflection-cycle-auto ()
-    "switching by major-mode"
-    (interactive)
-    (cond
-     ;; for emacs-lisp-mode
-     ((eq major-mode 'emacs-lisp-mode)
-      (string-inflection-all-cycle))
-     ;; for python
-     ((eq major-mode 'python-mode)
-      (string-inflection-python-style-cycle))
-     ;; for java
-     ((eq major-mode 'java-mode)
-      (string-inflection-java-style-cycle))
-     (t
-      ;; default
-      (string-inflection-ruby-style-cycle))))
+  "switching by major-mode"
+  (interactive)
+  (cond
+   ;; for emacs-lisp-mode
+   ((eq major-mode 'emacs-lisp-mode)
+    (string-inflection-all-cycle))
+   ;; for python
+   ((eq major-mode 'python-mode)
+    (string-inflection-python-style-cycle))
+   ;; for java
+   ((eq major-mode 'java-mode)
+    (string-inflection-java-style-cycle))
+   (t
+    ;; default
+    (string-inflection-ruby-style-cycle))))
 
 (use-package string-inflection
   :defer 1
@@ -172,7 +176,7 @@
   (define-key yas-minor-mode-map (kbd "C-'") #'yas-expand)
   (yas-reload-all)
   (setq yas-snippet-dirs
-      '("~/.emacs.d/snippets"))
+        '("~/.emacs.d/snippets"))
   (setq yas-prompt-functions '(yas-ido-prompt))
   (defun help/yas-after-exit-snippet-hook-fn ()
     (prettify-symbols-mode)
@@ -216,7 +220,7 @@
   :diminish
   :init
   (setq ivy-re-builders-alist
-      '((t . ivy--regex-ignore-order)))
+        '((t . ivy--regex-ignore-order)))
   :bind ("C-c C-r" . ivy-resume)
   :custom
   (ivy-count-format "(%d/%d) ")
@@ -228,8 +232,9 @@
   :config
   (ivy-rich-mode 1))
 
-;; Ag
+;; Search engines
 (use-package ag)
+(use-package ripgrep)
 
 ;; Projectile
 (use-package projectile
