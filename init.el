@@ -14,6 +14,7 @@
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
 (menu-bar-mode -1)
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
 
 (setq hg/packages '(exec-path-from-shell
 		    magit
@@ -22,9 +23,15 @@
 
 ; define custom functions
 (defun hg/sync-packages (packages)
+  "Install any missing packages on startup."
   (dolist (package hg/packages)
     (when (not (package-installed-p package))
       (package-install package))))
+
+(defun hg/fix-c-indent-offset-according-to-syntax-context (key val)
+  "Fix c braces KEY VAL."
+  (setq c-offsets-alist (delq (assoc key c-offsets-alist) c-offsets-alist))
+  (add-to-list 'c-offsets-alist '(key . val)))
 
 ; refresh and load packages
 (package-refresh-contents 'async)
