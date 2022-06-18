@@ -11,6 +11,9 @@
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (setq lisp-indent-function 'common-lisp-indent-function)
 (setq mac-command-modifier 'ctrl)
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
+(menu-bar-mode -1)
 
 (setq hg/packages '(exec-path-from-shell
 		    magit
@@ -31,10 +34,10 @@
 (exec-path-from-shell-initialize)
 
 ; package settings
-(fido-mode)
+(fido-mode 1)
 (setq ido-enable-flex-matching t)
 (setq ido-enable-prefix t)
-(global-company-mode)
+(global-company-mode 1)
 
 ; key bindings
 (global-set-key (kbd "C-M-y") #'browse-kill-ring)
