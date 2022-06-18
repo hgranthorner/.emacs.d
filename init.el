@@ -54,3 +54,4 @@
 
 ; key bindings
 (global-set-key (kbd "C-M-y") #'browse-kill-ring)
+(global-set-key (kbd "M-o") #'other-window)
