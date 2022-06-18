@@ -65,4 +65,5 @@
 (global-set-key (kbd "C-c C->") #'mc/mark-all-like-this)
 ;;; makes it so that you need to "C-g" to get out of multiple cursor
 ;;; mode, return inserts a new line.
-(define-key mc/keymap (kbd "<return>") nil)
+(with-eval-after-load "multiple-cursors"
+  (keymap-set mc/keymap "<return>" nil))
