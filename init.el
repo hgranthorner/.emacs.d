@@ -52,6 +52,7 @@
 (setq ido-enable-flex-matching t)
 (setq ido-enable-prefix t)
 (global-company-mode 1)
+(setq mc/always-run-for-all t)
 
 ; key bindings
 (global-set-key (kbd "C-M-y") #'browse-kill-ring)
@@ -61,4 +62,4 @@
 (global-set-key (kbd "C-M->")	#'mc/edit-lines)
 (global-set-key (kbd "C->")     #'mc/mark-next-like-this)
 (global-set-key (kbd "C-<")	#'mc/mark-previous-like-this)
-(global-set-key (kbd "C-c C-<") #'mc/mark-all-like-this)
+(global-set-key (kbd "C-c C->") #'mc/mark-all-like-this)
