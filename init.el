@@ -16,6 +16,7 @@
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
 (menu-bar-mode -1)
+(delete-selection-mode 1)
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 ;; fixes c indentation
 (setq c-default-style "bsd"
