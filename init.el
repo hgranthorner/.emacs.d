@@ -27,7 +27,4 @@
 ; exec path from shell for mac
 (exec-path-from-shell-initialize)
 
-; not sure why I need this, but commit fails otherwise on m1 mac
-(setq global-git-commit-mode nil)
-
 ; key bindings
