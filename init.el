@@ -7,6 +7,8 @@
 (package-initialize)
 
 ; set custom settings
+(add-hook 'window-setup-hook 'toggle-frame-maximized t)
+(defalias 'yes-or-no-p 'y-or-n-p)
 (setq make-backup-files nil)
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (setq lisp-indent-function 'common-lisp-indent-function)
@@ -15,6 +17,9 @@
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
+;; fixes c indentation
+(setq c-default-style "bsd"
+      c-basic-offset 2)
 
 (setq hg/packages '(exec-path-from-shell
 		    magit
