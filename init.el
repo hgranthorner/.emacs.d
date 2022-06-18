@@ -25,7 +25,8 @@
 (setq hg/packages '(exec-path-from-shell
 		    magit
 		    browse-kill-ring
-		    company))
+		    company
+		    multiple-cursors))
 
 ; define custom functions
 (defun hg/sync-packages (packages)
@@ -55,3 +56,9 @@
 ; key bindings
 (global-set-key (kbd "C-M-y") #'browse-kill-ring)
 (global-set-key (kbd "M-o") #'other-window)
+
+;; multiple cursors
+(global-set-key (kbd "C-M->")	#'mc/edit-lines)
+(global-set-key (kbd "C->")     #'mc/mark-next-like-this)
+(global-set-key (kbd "C-<")	#'mc/mark-previous-like-this)
+(global-set-key (kbd "C-c C-<") #'mc/mark-all-like-this)
