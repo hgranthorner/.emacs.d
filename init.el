@@ -63,3 +63,6 @@
 (global-set-key (kbd "C->")     #'mc/mark-next-like-this)
 (global-set-key (kbd "C-<")	#'mc/mark-previous-like-this)
 (global-set-key (kbd "C-c C->") #'mc/mark-all-like-this)
+;;; makes it so that you need to "C-g" to get out of multiple cursor
+;;; mode, return inserts a new line.
+(define-key mc/keymap (kbd "<return>") nil)
