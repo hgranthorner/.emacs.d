@@ -21,6 +21,7 @@
 ;; fixes c indentation
 (setq c-default-style "bsd"
       c-basic-offset 2)
+(setq-default indent-tabs-mode nil)
 
 (setq hg/packages '(exec-path-from-shell
 		    magit
@@ -56,7 +57,8 @@
 
 ; key bindings
 (global-set-key (kbd "C-M-y") #'browse-kill-ring)
-(global-set-key (kbd "M-o") #'other-window)
+(global-set-key (kbd "M-o")   #'other-window)
+(global-set-key (kbd "M-i")   #'imenu)
 
 ;; multiple cursors
 (global-set-key (kbd "C-M->")	#'mc/edit-lines)
