@@ -44,6 +44,7 @@
 ; refresh and load packages
 (package-refresh-contents 'async)
 (hg/sync-packages hg/packages)
+(load custom-file)
 
 ; exec path from shell for mac
 (exec-path-from-shell-initialize)
