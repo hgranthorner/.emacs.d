@@ -17,17 +17,12 @@
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 (delete-selection-mode 1)
+(electric-pair-mode 1)
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 ;; fixes c indentation
 (setq c-default-style "bsd"
       c-basic-offset 2)
 (setq-default indent-tabs-mode nil)
-
-(setq hg/packages '(exec-path-from-shell
-		    magit
-		    browse-kill-ring
-		    company
-		    multiple-cursors))
 
 ; define custom functions
 (defun hg/sync-packages (packages)
@@ -43,7 +38,20 @@
 
 ; refresh and load packages
 (package-refresh-contents 'async)
+
+
+(setq hg/packages '(exec-path-from-shell
+		    magit
+		    browse-kill-ring
+		    company
+		    multiple-cursors
+                    rust-mode
+                    eglot
+                    ;lsp-mode
+                    cider
+                    paredit))
 (hg/sync-packages hg/packages)
+
 (load custom-file)
 
 ; exec path from shell for mac
@@ -60,6 +68,39 @@
 (global-set-key (kbd "C-M-y") #'browse-kill-ring)
 (global-set-key (kbd "M-o")   #'other-window)
 (global-set-key (kbd "M-i")   #'imenu)
+(global-set-key (kbd "C-M-.") #'end-of-buffer)
+(global-set-key (kbd "C-M-,") #'beginning-of-buffer)
+
+;; company
+(with-eval-after-load "company"
+  (define-key company-mode-map (kbd "M-,") #'company-complete))
+
+;; lsp/eglot
+(defun hg/setup-lsp ()
+  (add-hook 'rust-mode-hook #'lsp-deferred)
+  (add-hook 'clojure-mode-hook #'lsp-deferred)
+  (setq lsp-display-inline-image nil)
+  (setq lsp-lens-enable nil)
+
+  (with-eval-after-load "lsp-mode"
+    (define-key lsp-mode-map (kbd "C-c r") #'lsp-rename)
+    (define-key lsp-mode-map (kbd "C-c a") #'lsp-execute-code-action)
+    (define-key lsp-mode-map (kbd "C-c f") #'lsp-format-buffer)
+    (define-key lsp-mode-map (kbd "C-c d") #'lsp-find-definition)))
+
+(defun hg/setup-eglot ()
+  (add-hook 'clojure-mode-hook #'eglot-ensure)
+  (with-eval-after-load "eglot"
+    (define-key eglot-mode-map (kbd "C-c r") #'eglot-rename)
+    (define-key eglot-mode-map (kbd "C-c a") #'eglot-code-actions)
+    (define-key eglot-mode-map (kbd "C-c f") #'eglot-format-buffer)
+    (define-key eglot-mode-map (kbd "C-c d") #'xref-find-definitions)
+    (define-key eglot-mode-map (kbd "C-c h") #'eldoc)))
+
+(setq use-eglot t)
+(if use-eglot
+    (hg/setup-eglot)
+  (hg/setup-lsp))
 
 ;; multiple cursors
 (global-set-key (kbd "C-M->")	#'mc/edit-lines)
@@ -70,3 +111,20 @@
 ;;; mode, return inserts a new line.
 (with-eval-after-load "multiple-cursors"
   (keymap-set mc/keymap "<return>" nil))
+
+;; paredit
+
+(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+
+(with-eval-after-load "paredit"
+  (setcdr paredit-mode-map nil)
+  (define-key paredit-mode-map (kbd "M-.") #'paredit-forward-slurp-sexp)
+  (define-key paredit-mode-map (kbd "M-,") #'paredit-backward-slurp-sexp)
+  (define-key paredit-mode-map (kbd "M->") #'paredit-forward-barf-sexp)
+  (define-key paredit-mode-map (kbd "M-<") #'paredit-backward-barf-sexp))
+
+(setq lisp-mode-hooks '((emacs-lisp-mode-hook emacs-lisp-mode)
+                        (clojure-mode-hook clojure-mode)))
+
+(dolist (hook lisp-mode-hooks)
+  (add-hook (car hook) #'enable-paredit-mode))
