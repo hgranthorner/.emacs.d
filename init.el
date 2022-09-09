@@ -50,12 +50,13 @@
                     which-key
                     ;lsp-mode
                     cider
+                    sly
                     paredit))
 (hg/sync-packages hg/packages)
 
 (load custom-file)
 
-; exec path from shell for mac
+;; exec path from shell for mac
 (exec-path-from-shell-initialize)
 
 ;; package settings
@@ -66,8 +67,9 @@
 (setq ido-enable-prefix t)
 (global-company-mode 1)
 (setq mc/always-run-for-all t)
+(setq inferior-lisp-program "sbcl")
 
-; key bindings
+;; key bindings
 (global-set-key (kbd "C-M-y") #'browse-kill-ring)
 (global-set-key (kbd "M-o")   #'other-window)
 (global-set-key (kbd "M-i")   #'imenu)
