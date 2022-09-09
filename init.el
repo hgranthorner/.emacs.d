@@ -58,7 +58,8 @@
 ; exec path from shell for mac
 (exec-path-from-shell-initialize)
 
-; package settings
+;; package settings
+(setq cider-repl-display-help-banner nil)
 (which-key-mode)
 (fido-mode 1)
 (setq ido-enable-flex-matching t)
