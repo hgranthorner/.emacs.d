@@ -47,6 +47,7 @@
 		    multiple-cursors
                     rust-mode
                     eglot
+                    which-key
                     ;lsp-mode
                     cider
                     paredit))
@@ -58,6 +59,7 @@
 (exec-path-from-shell-initialize)
 
 ; package settings
+(which-key-mode)
 (fido-mode 1)
 (setq ido-enable-flex-matching t)
 (setq ido-enable-prefix t)
@@ -128,3 +130,7 @@
 
 (dolist (hook lisp-mode-hooks)
   (add-hook (car hook) #'enable-paredit-mode))
+
+(with-eval-after-load "cider"
+  (define-key cider-mode-map (kbd "C-c i r") #'cider-inspect-last-result)
+  (define-key cider-mode-map (kbd "C-c i c") #'cider-inspect-last-sexp))
