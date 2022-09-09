@@ -41,6 +41,7 @@
 
 
 (setq hg/packages '(exec-path-from-shell
+                    gruvbox-theme
 		    magit
 		    browse-kill-ring
 		    company
@@ -60,6 +61,7 @@
 (exec-path-from-shell-initialize)
 
 ;; package settings
+(load-theme 'gruvbox-dark-medium)
 (setq cider-repl-display-help-banner nil)
 (which-key-mode)
 (fido-mode 1)
