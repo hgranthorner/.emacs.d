@@ -23,6 +23,12 @@
 (setq c-default-style "bsd"
       c-basic-offset 2)
 (setq-default indent-tabs-mode nil)
+(setq reb-re-syntax 'string)
+
+;; Added for the defstar library in common lisp
+(font-lock-add-keywords 'lisp-mode '("[[:word:]:]*def.*\\*"))
+
+
 
 ; define custom functions
 (defun hg/sync-packages (packages)
@@ -61,7 +67,7 @@
 (exec-path-from-shell-initialize)
 
 ;; package settings
-(load-theme 'gruvbox-dark-medium)
+(load-theme 'gruvbox-dark-hard)
 (setq cider-repl-display-help-banner nil)
 (which-key-mode)
 (fido-mode 1)
@@ -131,7 +137,9 @@
   (define-key paredit-mode-map (kbd "M-<") #'paredit-backward-barf-sexp))
 
 (setq lisp-mode-hooks '((emacs-lisp-mode-hook emacs-lisp-mode)
-                        (clojure-mode-hook clojure-mode)))
+                        (clojure-mode-hook clojure-mode)
+                        (lisp-mode-hook lisp-mode)
+                        (sly-mode-hook sly-mode)))
 
 (dolist (hook lisp-mode-hooks)
   (add-hook (car hook) #'enable-paredit-mode))
@@ -139,3 +147,9 @@
 (with-eval-after-load "cider"
   (define-key cider-mode-map (kbd "C-c i r") #'cider-inspect-last-result)
   (define-key cider-mode-map (kbd "C-c i c") #'cider-inspect-last-sexp))
+
+(with-eval-after-load "sly"
+  (keymap-unset sly-mode-map "M-.")
+  (keymap-unset sly-mode-map "M-,")
+  (define-key sly-mode-map (kbd "C-.") #'sly-edit-definition)
+  (define-key sly-mode-map (kbd "C-,") #'sly-pop-find-definition-stack))
