@@ -24,6 +24,8 @@
       c-basic-offset 2)
 (setq-default indent-tabs-mode nil)
 (setq reb-re-syntax 'string)
+(setq default-tab-width 4)
+(setq tab-width 4)
 
 ;; Added for the defstar library in common lisp
 (font-lock-add-keywords 'lisp-mode '("[[:word:]:]*def.*\\*"))
@@ -58,6 +60,10 @@
                     ;lsp-mode
                     cider
                     sly
+                    yasnippet
+                    yasnippet-snippets
+                    go-mode
+                    nand2tetris
                     paredit))
 (hg/sync-packages hg/packages)
 
@@ -76,6 +82,8 @@
 (global-company-mode 1)
 (setq mc/always-run-for-all t)
 (setq inferior-lisp-program "sbcl")
+(yas-global-mode 1)
+(add-to-list 'auto-mode-alist '("\.hdl" . nand2tetris-mode))
 
 ;; key bindings
 (global-set-key (kbd "C-M-y") #'browse-kill-ring)
@@ -83,6 +91,7 @@
 (global-set-key (kbd "M-i")   #'imenu)
 (global-set-key (kbd "C-M-.") #'end-of-buffer)
 (global-set-key (kbd "C-M-,") #'beginning-of-buffer)
+(global-set-key (kbd "C-.")   #'xref-find-definitions)
 
 ;; company
 (with-eval-after-load "company"
@@ -103,6 +112,7 @@
 
 (defun hg/setup-eglot ()
   (add-hook 'clojure-mode-hook #'eglot-ensure)
+  (add-hook 'go-mode-hook #'eglot-ensure)
   (with-eval-after-load "eglot"
     (define-key eglot-mode-map (kbd "C-c r") #'eglot-rename)
     (define-key eglot-mode-map (kbd "C-c a") #'eglot-code-actions)
@@ -153,3 +163,5 @@
   (keymap-unset sly-mode-map "M-,")
   (define-key sly-mode-map (kbd "C-.") #'sly-edit-definition)
   (define-key sly-mode-map (kbd "C-,") #'sly-pop-find-definition-stack))
+
+;; go
