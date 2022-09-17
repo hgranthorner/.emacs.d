@@ -25,7 +25,7 @@
 (setq-default indent-tabs-mode nil)
 (setq reb-re-syntax 'string)
 (setq default-tab-width 4)
-(setq tab-width 4)
+(setq-default tab-width 4)
 
 ;; Added for the defstar library in common lisp
 (font-lock-add-keywords 'lisp-mode '("[[:word:]:]*def.*\\*"))
@@ -43,6 +43,9 @@
   "Fix c braces KEY VAL."
   (setq c-offsets-alist (delq (assoc key c-offsets-alist) c-offsets-alist))
   (add-to-list 'c-offsets-alist '(key . val)))
+
+(defun hg/refresh-projects ()
+  (project--read-project-list))
 
 ; refresh and load packages
 (package-refresh-contents 'async)
@@ -64,6 +67,7 @@
                     yasnippet-snippets
                     go-mode
                     nand2tetris
+                    nand2tetris-assembler
                     paredit))
 (hg/sync-packages hg/packages)
 
@@ -92,6 +96,7 @@
 (global-set-key (kbd "C-M-.") #'end-of-buffer)
 (global-set-key (kbd "C-M-,") #'beginning-of-buffer)
 (global-set-key (kbd "C-.")   #'xref-find-definitions)
+(global-set-key (kbd "<f5>")  #'compile)
 
 ;; company
 (with-eval-after-load "company"
