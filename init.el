@@ -97,6 +97,7 @@
 (global-set-key (kbd "C-M-,") #'beginning-of-buffer)
 (global-set-key (kbd "C-.")   #'xref-find-definitions)
 (global-set-key (kbd "<f5>")  #'compile)
+(global-set-key (kbd "C-c r r") #'revert-buffer)
 
 ;; company
 (with-eval-after-load "company"
