@@ -1,12 +1,16 @@
-; set up melpa
+;; set up melpa
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (setq package-archive-priorities '(("melpa" . 10)
-				   ("gnu" . 5)
-				   ("nongnu" . 2)))
+				                   ("gnu" . 5)
+				                   ("nongnu" . 2)))
+
+(setq gc-cons-threshold 100000000)
+(setq read-process-output-max (* 1024 1024))
+
 (package-initialize)
 
-; set custom settings
+;; set custom settings
 (add-hook 'window-setup-hook 'toggle-frame-maximized t)
 (defalias 'yes-or-no-p 'y-or-n-p)
 (setq make-backup-files nil)
@@ -30,9 +34,7 @@
 ;; Added for the defstar library in common lisp
 (font-lock-add-keywords 'lisp-mode '("[[:word:]:]*def.*\\*"))
 
-
-
-; define custom functions
+;; define custom functions
 (defun hg/sync-packages (packages)
   "Install any missing packages on startup."
   (dolist (package hg/packages)
@@ -47,7 +49,7 @@
 (defun hg/refresh-projects ()
   (project--read-project-list))
 
-; refresh and load packages
+;; refresh and load packages
 (package-refresh-contents 'async)
 
 
@@ -60,7 +62,7 @@
                     rust-mode
                     eglot
                     which-key
-                    ;lsp-mode
+                    lsp-mode
                     cider
                     sly
                     yasnippet
@@ -90,14 +92,17 @@
 (add-to-list 'auto-mode-alist '("\.hdl" . nand2tetris-mode))
 
 ;; key bindings
-(global-set-key (kbd "C-M-y") #'browse-kill-ring)
-(global-set-key (kbd "M-o")   #'other-window)
-(global-set-key (kbd "M-i")   #'imenu)
-(global-set-key (kbd "C-M-.") #'end-of-buffer)
-(global-set-key (kbd "C-M-,") #'beginning-of-buffer)
-(global-set-key (kbd "C-.")   #'xref-find-definitions)
-(global-set-key (kbd "<f5>")  #'compile)
+(global-set-key (kbd "C-M-y")   #'browse-kill-ring)
+(global-set-key (kbd "M-o")     #'other-window)
+(global-set-key (kbd "M-i")     #'imenu)
+(global-set-key (kbd "C-M-.")   #'end-of-buffer)
+(global-set-key (kbd "C-M-,")   #'beginning-of-buffer)
+(global-set-key (kbd "C-.")     #'xref-find-definitions)
+(global-set-key (kbd "C-,")     #'xref-go-back)
+(global-set-key (kbd "<f5>")    #'compile)
 (global-set-key (kbd "C-c r r") #'revert-buffer)
+(global-set-key (kbd "M-]")     #'forward-paragraph)
+(global-set-key (kbd "M-[")     #'backward-paragraph)
 
 ;; company
 (with-eval-after-load "company"
@@ -107,6 +112,7 @@
 (defun hg/setup-lsp ()
   (add-hook 'rust-mode-hook #'lsp-deferred)
   (add-hook 'clojure-mode-hook #'lsp-deferred)
+  (add-hook 'go-mode-hook #'lsp-deferred)
   (setq lsp-display-inline-image nil)
   (setq lsp-lens-enable nil)
 
@@ -126,7 +132,7 @@
     (define-key eglot-mode-map (kbd "C-c d") #'xref-find-definitions)
     (define-key eglot-mode-map (kbd "C-c h") #'eldoc)))
 
-(setq use-eglot t)
+(setq use-eglot nil)
 (if use-eglot
     (hg/setup-eglot)
   (hg/setup-lsp))
