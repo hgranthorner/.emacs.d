@@ -15,7 +15,6 @@
 (defalias 'yes-or-no-p 'y-or-n-p)
 (setq make-backup-files nil)
 (setq custom-file (concat user-emacs-directory "custom.el"))
-(setq lisp-indent-function 'common-lisp-indent-function)
 (setq mac-command-modifier 'ctrl)
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
@@ -55,10 +54,10 @@
 
 (setq hg/packages '(exec-path-from-shell
                     gruvbox-theme
-		    magit
-		    browse-kill-ring
-		    company
-		    multiple-cursors
+                    magit
+                    browse-kill-ring
+                    company
+                    multiple-cursors
                     rust-mode
                     eglot
                     which-key
@@ -69,7 +68,6 @@
                     yasnippet-snippets
                     go-mode
                     nand2tetris
-                    nand2tetris-assembler
                     paredit))
 (hg/sync-packages hg/packages)
 
@@ -85,12 +83,11 @@
 (fido-mode 1)
 (setq ido-enable-flex-matching t)
 (setq ido-enable-prefix t)
-(global-company-mode 1)
 (setq mc/always-run-for-all t)
 (setq inferior-lisp-program "sbcl")
 (yas-global-mode 1)
 (add-to-list 'auto-mode-alist '("\.hdl" . nand2tetris-mode))
-
+(global-company-mode 1)
 ;; key bindings
 (global-set-key (kbd "C-M-y")   #'browse-kill-ring)
 (global-set-key (kbd "M-o")     #'other-window)
@@ -103,36 +100,36 @@
 (global-set-key (kbd "C-c r r") #'revert-buffer)
 (global-set-key (kbd "M-]")     #'forward-paragraph)
 (global-set-key (kbd "M-[")     #'backward-paragraph)
-
-;; company
-(with-eval-after-load "company"
-  (define-key company-mode-map (kbd "M-,") #'company-complete))
-
+(global-set-key (kbd "C-h h")   #'eldoc)
 ;; lsp/eglot
 (defun hg/setup-lsp ()
   (add-hook 'rust-mode-hook #'lsp-deferred)
   (add-hook 'clojure-mode-hook #'lsp-deferred)
   (add-hook 'go-mode-hook #'lsp-deferred)
+  (setq lsp-headerline-breadcrumb-enable nil)
   (setq lsp-display-inline-image nil)
   (setq lsp-lens-enable nil)
 
   (with-eval-after-load "lsp-mode"
+    (lsp-enable-which-key-integration t)
     (define-key lsp-mode-map (kbd "C-c r") #'lsp-rename)
     (define-key lsp-mode-map (kbd "C-c a") #'lsp-execute-code-action)
     (define-key lsp-mode-map (kbd "C-c f") #'lsp-format-buffer)
-    (define-key lsp-mode-map (kbd "C-c d") #'lsp-find-definition)))
+    (define-key lsp-mode-map (kbd "C-c d") #'lsp-find-definition)
+    (define-key lsp-mode-map (kbd "C-c k") #'lsp-find-references)))
 
 (defun hg/setup-eglot ()
   (add-hook 'clojure-mode-hook #'eglot-ensure)
   (add-hook 'go-mode-hook #'eglot-ensure)
+  (add-hook 'rust-mode-hook #'eglot-ensure)
+  (setq eglot-events-buffer-size 0)
   (with-eval-after-load "eglot"
     (define-key eglot-mode-map (kbd "C-c r") #'eglot-rename)
     (define-key eglot-mode-map (kbd "C-c a") #'eglot-code-actions)
     (define-key eglot-mode-map (kbd "C-c f") #'eglot-format-buffer)
-    (define-key eglot-mode-map (kbd "C-c d") #'xref-find-definitions)
-    (define-key eglot-mode-map (kbd "C-c h") #'eldoc)))
+    (define-key eglot-mode-map (kbd "C-c d") #'xref-find-definitions)))
 
-(setq use-eglot nil)
+(setq use-eglot t)
 (if use-eglot
     (hg/setup-eglot)
   (hg/setup-lsp))
@@ -170,10 +167,15 @@
   (define-key cider-mode-map (kbd "C-c i r") #'cider-inspect-last-result)
   (define-key cider-mode-map (kbd "C-c i c") #'cider-inspect-last-sexp))
 
+(add-hook 'lisp-mode-hook
+		  (lambda ()
+			(set (make-local-variable 'lisp-indent-function)
+				 'common-lisp-indent-function)))
+
 (with-eval-after-load "sly"
   (keymap-unset sly-mode-map "M-.")
   (keymap-unset sly-mode-map "M-,")
   (define-key sly-mode-map (kbd "C-.") #'sly-edit-definition)
   (define-key sly-mode-map (kbd "C-,") #'sly-pop-find-definition-stack))
 
-;; go
+;; bgo
