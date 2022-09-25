@@ -101,6 +101,8 @@
 (global-set-key (kbd "M-]")     #'forward-paragraph)
 (global-set-key (kbd "M-[")     #'backward-paragraph)
 (global-set-key (kbd "C-h h")   #'eldoc)
+(global-set-key (kbd "C-]")     #'flymake-goto-next-error)
+
 ;; lsp/eglot
 (defun hg/setup-lsp ()
   (add-hook 'rust-mode-hook #'lsp-deferred)

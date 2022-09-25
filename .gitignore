@@ -5,3 +5,5 @@ elpa
 transient
 /projects
 /.lsp-session-v1
+eshell
+url
