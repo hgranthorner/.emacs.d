@@ -68,6 +68,8 @@
                     yasnippet-snippets
                     go-mode
                     nand2tetris
+                    evil
+                    evil-collection
                     paredit))
 (hg/sync-packages hg/packages)
 
@@ -78,16 +80,25 @@
 
 ;; package settings
 (load-theme 'gruvbox-dark-hard)
+
 (setq cider-repl-display-help-banner nil)
-(which-key-mode)
-(fido-mode 1)
 (setq ido-enable-flex-matching t)
 (setq ido-enable-prefix t)
 (setq mc/always-run-for-all t)
 (setq inferior-lisp-program "sbcl")
+(setq enable-evil nil)
+
+(when enable-evil
+  (setq evil-want-keybinding nil)
+  (setq evil-move-beyond-eol t)
+  (require 'evil))
+
+(which-key-mode)
+(fido-mode 1)
 (yas-global-mode 1)
 (add-to-list 'auto-mode-alist '("\.hdl" . nand2tetris-mode))
 (global-company-mode 1)
+
 ;; key bindings
 (global-set-key (kbd "C-M-y")   #'browse-kill-ring)
 (global-set-key (kbd "M-o")     #'other-window)
@@ -180,4 +191,31 @@
   (define-key sly-mode-map (kbd "C-.") #'sly-edit-definition)
   (define-key sly-mode-map (kbd "C-,") #'sly-pop-find-definition-stack))
 
-;; bgo
+;; evil
+
+(with-eval-after-load "evil"
+  (evil-mode 1)
+  (evil-collection-init)
+  (setq evil-leader "SPC")
+  (evil-set-leader 'motion (kbd evil-leader))
+  (evil-set-leader 'motion (kbd ",") 'local)
+
+  (evil-define-key 'motion 'global (kbd "k") #'evil-previous-visual-line)
+  (evil-define-key 'motion 'global (kbd "j") #'evil-next-visual-line)
+
+  (evil-define-key 'motion 'global (kbd "C-.") nil)
+
+  (evil-define-key 'motion 'global (kbd "<leader>wh") #'evil-window-left)
+  (evil-define-key 'motion 'global (kbd "<leader>wj") #'evil-window-down)
+  (evil-define-key 'motion 'global (kbd "<leader>wk") #'evil-window-up)
+  (evil-define-key 'motion 'global (kbd "<leader>wl") #'evil-window-right)
+  (evil-define-key 'motion 'global (kbd "<leader>wd") #'delete-window)
+  (evil-define-key 'motion 'global (kbd "<leader>ws") #'split-window-below)
+  (evil-define-key 'motion 'global (kbd "<leader>wv") #'split-window-right)
+
+  (evil-define-key 'motion 'global (kbd "<leader>fs") #'save-buffer)
+  (evil-define-key 'motion 'global (kbd "<leader>ff") #'find-file)
+
+  (evil-define-key 'motion 'global (kbd "<leader>h") help-map)
+
+  (evil-define-key 'motion 'emacs-lisp-mode-map (kbd "<localleader>e") #'eval-last-sexp))
