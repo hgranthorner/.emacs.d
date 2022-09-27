@@ -74,6 +74,7 @@
                     marginalia
                     orderless
                     org
+                    projectile
                     paredit))
 (hg/sync-packages hg/packages)
 
@@ -91,6 +92,7 @@
 (setq mc/always-run-for-all t)
 (setq inferior-lisp-program "sbcl")
 (setq enable-evil nil)
+(setq projectile-project-search-path '(("~/src/github.com/hgranthorner" . 2)))
 
 (when enable-evil
   (setq evil-want-keybinding nil)
@@ -104,8 +106,10 @@
 (vertico-mode)
 (marginalia-mode)
 (yas-global-mode 1)
-(add-to-list 'auto-mode-alist '("\.hdl" . nand2tetris-mode))
 (global-company-mode 1)
+(projectile-mode 1)
+
+(add-to-list 'auto-mode-alist '("\.hdl" . nand2tetris-mode))
 
 ;; key bindings
 (global-set-key (kbd "C-M-y")   #'browse-kill-ring)
@@ -121,6 +125,7 @@
 (global-set-key (kbd "M-[")     #'backward-paragraph)
 (global-set-key (kbd "C-h h")   #'eldoc)
 (global-set-key (kbd "C-]")     #'flymake-goto-next-error)
+(define-key projectile-mode-map (kbd "C-x p") 'projectile-command-map)
 
 ;; lsp/eglot
 (defun hg/setup-lsp ()
