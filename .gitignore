@@ -7,3 +7,4 @@ transient
 /.lsp-session-v1
 eshell
 url
+projectile*
