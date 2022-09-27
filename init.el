@@ -70,10 +70,16 @@
                     nand2tetris
                     evil
                     evil-collection
+                    vertico
+                    marginalia
+                    orderless
+                    org
                     paredit))
 (hg/sync-packages hg/packages)
 
 (load custom-file)
+
+(set-face-attribute 'default nil :height 140)
 
 ;; exec path from shell for mac
 (exec-path-from-shell-initialize)
@@ -82,8 +88,6 @@
 (load-theme 'gruvbox-dark-hard)
 
 (setq cider-repl-display-help-banner nil)
-(setq ido-enable-flex-matching t)
-(setq ido-enable-prefix t)
 (setq mc/always-run-for-all t)
 (setq inferior-lisp-program "sbcl")
 (setq enable-evil nil)
@@ -93,8 +97,12 @@
   (setq evil-move-beyond-eol t)
   (require 'evil))
 
+(setq completion-styles '(orderless basic)
+      completion-category-overrides '((file (styles basic partial-completion))))
+
 (which-key-mode)
-(fido-mode 1)
+(vertico-mode)
+(marginalia-mode)
 (yas-global-mode 1)
 (add-to-list 'auto-mode-alist '("\.hdl" . nand2tetris-mode))
 (global-company-mode 1)
