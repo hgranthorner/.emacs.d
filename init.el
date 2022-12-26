@@ -11,10 +11,13 @@
 (package-initialize)
 
 ;; set custom settings
+(setq inhibit-startup-message t)
+(setq initial-scratch-message nil)
 (add-hook 'window-setup-hook 'toggle-frame-maximized t)
 (defalias 'yes-or-no-p 'y-or-n-p)
 (setq make-backup-files nil)
 (setq custom-file (concat user-emacs-directory "custom.el"))
+(load custom-file)
 (setq mac-command-modifier 'ctrl)
 (scroll-bar-mode -1)
 (tool-bar-mode -1)
@@ -29,90 +32,9 @@
 (setq reb-re-syntax 'string)
 (setq default-tab-width 4)
 (setq-default tab-width 4)
-
-;; Added for the defstar library in common lisp
-(font-lock-add-keywords 'lisp-mode '("[[:word:]:]*def.*\\*"))
-
-;; define custom functions
-(defun hg/sync-packages (packages)
-  "Install any missing packages on startup."
-  (dolist (package hg/packages)
-    (when (not (package-installed-p package))
-      (package-install package))))
-
-(defun hg/fix-c-indent-offset-according-to-syntax-context (key val)
-  "Fix c braces KEY VAL."
-  (setq c-offsets-alist (delq (assoc key c-offsets-alist) c-offsets-alist))
-  (add-to-list 'c-offsets-alist '(key . val)))
-
-(defun hg/refresh-projects ()
-  (project--read-project-list))
-
-;; refresh and load packages
-(package-refresh-contents 'async)
-
-
-(setq hg/packages '(exec-path-from-shell
-                    gruvbox-theme
-                    magit
-                    browse-kill-ring
-                    company
-                    multiple-cursors
-                    rust-mode
-                    eglot
-                    which-key
-                    lsp-mode
-                    cider
-                    sly
-                    yasnippet
-                    yasnippet-snippets
-                    go-mode
-                    nand2tetris
-                    evil
-                    evil-collection
-                    vertico
-                    marginalia
-                    orderless
-                    org
-                    projectile
-                    paredit))
-(hg/sync-packages hg/packages)
-
-(load custom-file)
-
-(set-face-attribute 'default nil :height 140)
-
-;; exec path from shell for mac
-(exec-path-from-shell-initialize)
-
-;; package settings
-(load-theme 'gruvbox-dark-hard)
-
-(setq cider-repl-display-help-banner nil)
-(setq mc/always-run-for-all t)
-(setq inferior-lisp-program "sbcl")
-(setq enable-evil nil)
-(setq projectile-project-search-path '(("~/src/github.com/hgranthorner" . 2)))
-
-(when enable-evil
-  (setq evil-want-keybinding nil)
-  (setq evil-move-beyond-eol t)
-  (require 'evil))
-
-(setq completion-styles '(orderless basic)
-      completion-category-overrides '((file (styles basic partial-completion))))
-
-(which-key-mode)
-(vertico-mode)
-(marginalia-mode)
-(yas-global-mode 1)
-(global-company-mode 1)
-(projectile-mode 1)
-
-(add-to-list 'auto-mode-alist '("\.hdl" . nand2tetris-mode))
+(set-face-attribute 'default nil :height 160 :family "Ubuntu Mono")
 
 ;; key bindings
-(global-set-key (kbd "C-M-y")   #'browse-kill-ring)
 (global-set-key (kbd "M-o")     #'other-window)
 (global-set-key (kbd "M-i")     #'imenu)
 (global-set-key (kbd "C-M-.")   #'end-of-buffer)
@@ -121,92 +43,95 @@
 (global-set-key (kbd "C-,")     #'xref-go-back)
 (global-set-key (kbd "<f5>")    #'compile)
 (global-set-key (kbd "C-c r r") #'revert-buffer)
+(global-set-key (kbd "C-c C-c") #'comment-or-uncomment-region)
 (global-set-key (kbd "M-]")     #'forward-paragraph)
 (global-set-key (kbd "M-[")     #'backward-paragraph)
 (global-set-key (kbd "C-h h")   #'eldoc)
 (global-set-key (kbd "C-]")     #'flymake-goto-next-error)
-(define-key projectile-mode-map (kbd "C-x p") 'projectile-command-map)
 
-;; lsp/eglot
-(defun hg/setup-lsp ()
-  (add-hook 'rust-mode-hook #'lsp-deferred)
-  (add-hook 'clojure-mode-hook #'lsp-deferred)
-  (add-hook 'go-mode-hook #'lsp-deferred)
-  (setq lsp-headerline-breadcrumb-enable nil)
-  (setq lsp-display-inline-image nil)
-  (setq lsp-lens-enable nil)
 
-  (with-eval-after-load "lsp-mode"
-    (lsp-enable-which-key-integration t)
-    (define-key lsp-mode-map (kbd "C-c r") #'lsp-rename)
-    (define-key lsp-mode-map (kbd "C-c a") #'lsp-execute-code-action)
-    (define-key lsp-mode-map (kbd "C-c f") #'lsp-format-buffer)
-    (define-key lsp-mode-map (kbd "C-c d") #'lsp-find-definition)
-    (define-key lsp-mode-map (kbd "C-c k") #'lsp-find-references)))
+;; Added for the defstar library in common lisp
+(font-lock-add-keywords 'lisp-mode '("[[:word:]:]*def.*\\*"))
 
-(defun hg/setup-eglot ()
-  (add-hook 'clojure-mode-hook #'eglot-ensure)
-  (add-hook 'go-mode-hook #'eglot-ensure)
-  (add-hook 'rust-mode-hook #'eglot-ensure)
-  (setq eglot-events-buffer-size 0)
-  (with-eval-after-load "eglot"
-    (define-key eglot-mode-map (kbd "C-c r") #'eglot-rename)
-    (define-key eglot-mode-map (kbd "C-c a") #'eglot-code-actions)
-    (define-key eglot-mode-map (kbd "C-c f") #'eglot-format-buffer)
-    (define-key eglot-mode-map (kbd "C-c d") #'xref-find-definitions)))
+(defun hg/fix-c-indent-offset-according-to-syntax-context (key val)
+  "Fix c braces KEY VAL."
+  (setq c-offsets-alist (delq (assoc key c-offsets-alist) c-offsets-alist))
+  (add-to-list 'c-offsets-alist '(key . val)))
 
-(setq use-eglot t)
-(if use-eglot
-    (hg/setup-eglot)
-  (hg/setup-lsp))
+(when (string= system-type "darwin")
+  (setq dired-use-ls-dired t
+        insert-directory-program "gls"
+        dired-listing-switches "-aBhl --group-directories-first"))
 
-;; multiple cursors
-(global-set-key (kbd "C-M->")	#'mc/edit-lines)
-(global-set-key (kbd "C->")     #'mc/mark-next-like-this)
-(global-set-key (kbd "C-<")	#'mc/mark-previous-like-this)
-(global-set-key (kbd "C-c C->") #'mc/mark-all-like-this)
-;;; makes it so that you need to "C-g" to get out of multiple cursor
-;;; mode, return inserts a new line.
-(with-eval-after-load "multiple-cursors"
+(require 'use-package)
+(require 'use-package-ensure)
+(require 'bind-key)
+(setq use-package-always-ensure t)
+
+(use-package exec-path-from-shell
+  :config
+  (exec-path-from-shell-initialize))
+
+(use-package diminish)
+
+(use-package gruvbox-theme
+  :config
+  (load-theme 'gruvbox-dark-hard))
+
+(use-package magit)
+
+(use-package browse-kill-ring
+  :bind (("C-M-y" . browse-kill-ring)))
+
+(use-package multiple-cursors
+  :init
+  (setq mc/always-run-for-all t)
+  :bind
+  (("C-M->" .   mc/edit-lines)
+   ("C->" .     mc/mark-next-like-this)
+   ("C-<" .     mc/mark-previous-like-this)
+   ("C-c C->" . mc/mark-all-like-this))
+  :config
   (keymap-set mc/keymap "<return>" nil))
 
-;; paredit
+(use-package company
+  :config
+  (global-company-mode 1))
 
-(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+(use-package which-key
+  :config
+  (which-key-mode 1))
 
-(with-eval-after-load "paredit"
-  (setcdr paredit-mode-map nil)
-  (define-key paredit-mode-map (kbd "M-.") #'paredit-forward-slurp-sexp)
-  (define-key paredit-mode-map (kbd "M-,") #'paredit-backward-slurp-sexp)
-  (define-key paredit-mode-map (kbd "M->") #'paredit-forward-barf-sexp)
-  (define-key paredit-mode-map (kbd "M-<") #'paredit-backward-barf-sexp))
+(use-package cider
+  :bind
+  (:map cider-mode-map
+        ("C-c i r" . cider-inspect-last-result)
+        ("C-c i c" . cider-inspect-last-sexp))
+  :init
+  (setq cider-repl-display-help-banner nil))
 
-(setq lisp-mode-hooks '((emacs-lisp-mode-hook emacs-lisp-mode)
-                        (clojure-mode-hook clojure-mode)
-                        (lisp-mode-hook lisp-mode)
-                        (sly-mode-hook sly-mode)))
-
-(dolist (hook lisp-mode-hooks)
-  (add-hook (car hook) #'enable-paredit-mode))
-
-(with-eval-after-load "cider"
-  (define-key cider-mode-map (kbd "C-c i r") #'cider-inspect-last-result)
-  (define-key cider-mode-map (kbd "C-c i c") #'cider-inspect-last-sexp))
-
-(add-hook 'lisp-mode-hook
-		  (lambda ()
-			(set (make-local-variable 'lisp-indent-function)
-				 'common-lisp-indent-function)))
-
-(with-eval-after-load "sly"
+(use-package sly
+  :bind
+  (:map sly-mode-map
+        ("C-." . sly-edit-definition)
+        ("C-," . sly-pop-find-definition-stack))
+  :init
+  (setq inferior-lisp-program "sbcl")
+  :config
   (keymap-unset sly-mode-map "M-.")
-  (keymap-unset sly-mode-map "M-,")
-  (define-key sly-mode-map (kbd "C-.") #'sly-edit-definition)
-  (define-key sly-mode-map (kbd "C-,") #'sly-pop-find-definition-stack))
+  (keymap-unset sly-mode-map "M-,"))
 
-;; evil
+(use-package yasnippet
+  :config
+  (yas-global-mode 1))
+(use-package yasnippet-snippets)
 
-(with-eval-after-load "evil"
+(use-package evil
+  :init
+  (setq evil-want-keybinding nil)
+  (setq evil-move-beyond-eol t)
+  (setq evil-want-C-u-scroll t)
+  :config
   (evil-mode 1)
   (evil-collection-init)
   (setq evil-leader "SPC")
@@ -231,4 +156,84 @@
 
   (evil-define-key 'motion 'global (kbd "<leader>h") help-map)
 
-  (evil-define-key 'motion 'emacs-lisp-mode-map (kbd "<localleader>e") #'eval-last-sexp))
+
+  (evil-define-key 'motion 'emacs-lisp-mode-map (kbd "<localleader>e") #'eval-last-sexp)
+  (evil-define-key 'motion 'lisp-mode-map (kbd "<localleader>sf") #'paredit-forward-slurp-sexp)
+  (evil-define-key 'motion 'lisp-mode-map (kbd "<localleader>sb") #'paredit-backward-slurp-sexp)
+  (evil-define-key 'motion 'lisp-mode-map (kbd "<localleader>bf") #'paredit-forward-barf-sexp)
+  (evil-define-key 'motion 'lisp-mode-map (kbd "<localleader>bb") #'paredit-backward-barf-sexp)
+  (evil-define-key 'motion 'lisp-mode-map (kbd "<localleader>e") #'sly-eval-last-expression))
+
+(use-package evil-collection)
+
+(use-package vertico
+  :config
+  (vertico-mode 1))
+
+(use-package marginalia
+  :config
+  (marginalia-mode 1))
+
+(use-package orderless
+  :init
+  (setq completion-styles '(orderless basic)
+        completion-category-overrides '((file (styles basic partial-completion)))))
+
+(use-package org)
+
+(use-package elixir-mode)
+
+(use-package ripgrep)
+
+(use-package paredit)
+
+;; (setf tree-sitter-module-path (concat (substring package-user-dir 0 (- (length package-user-dir) 4)) "tree-sitter-module"))
+;; (when (not (file-directory-p tree-sitter-module-path))
+;;  (magit-clone-bare "https://github.com/casouri/tree-sitter-module.git" tree-sitter-module-path))
+
+;; setting up syntaxes documented here: https://git.savannah.gnu.org/cgit/emacs.git/tree/admin/notes/tree-sitter/starter-guide?h=feature/tree-sitter
+(setq treesit-extra-load-path '("~/src/github.com/casouri/tree-sitter-module/dist"))
+(require 'treesit)
+
+(setq completion-styles '(orderless basic)
+      completion-category-overrides '((file (styles basic partial-completion))))
+
+(require 'eglot)
+(add-hook 'clojure-mode-hook #'eglot-ensure)
+(add-hook 'go-mode-hook      #'eglot-ensure)
+(add-hook 'rust-ts-mode-hook #'eglot-ensure)
+(add-hook 'elixir-mode-hook  #'eglot-ensure)
+(setq eglot-events-buffer-size 0)
+;; Set up using clippy with rust analyzer
+(setf (cdr (assoc '(rust-ts-mode rust-mode) eglot-server-programs))
+      (list "rust-analyzer" :initializationOptions '(:checkOnSave (:command "clippy"))))
+
+(with-eval-after-load "eglot"
+  (define-key eglot-mode-map (kbd "C-c r") #'eglot-rename)
+  (define-key eglot-mode-map (kbd "C-c a") #'eglot-code-actions)
+  (define-key eglot-mode-map (kbd "C-c f") #'eglot-format-buffer)
+  (define-key eglot-mode-map (kbd "C-c d") #'xref-find-definitions))
+
+;; paredit
+
+(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+
+(with-eval-after-load "paredit"
+  (setcdr paredit-mode-map nil)
+  (define-key paredit-mode-map (kbd "M-.") #'paredit-forward-slurp-sexp)
+  (define-key paredit-mode-map (kbd "M-,") #'paredit-backward-slurp-sexp)
+  (define-key paredit-mode-map (kbd "M->") #'paredit-forward-barf-sexp)
+  (define-key paredit-mode-map (kbd "M-<") #'paredit-backward-barf-sexp))
+
+(setq lisp-mode-hooks '((emacs-lisp-mode-hook emacs-lisp-mode)
+                        (clojure-mode-hook clojure-mode)
+                        (lisp-mode-hook lisp-mode)
+                        (sly-mode-hook sly-mode)))
+
+(dolist (hook lisp-mode-hooks)
+  (add-hook (car hook) #'enable-paredit-mode))
+
+(add-hook 'lisp-mode-hook
+		  (lambda ()
+			(set (make-local-variable 'lisp-indent-function)
+				 'common-lisp-indent-function)))
