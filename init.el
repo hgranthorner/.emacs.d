@@ -34,6 +34,7 @@
 (setq default-tab-width 4)
 (setq-default tab-width 4)
 (set-face-attribute 'default nil :height 160 :family "Ubuntu Mono")
+(setq is-mac (string= system-type "darwin"))
 
 ;; key bindings
 (global-set-key (kbd "M-o")     #'other-window)
@@ -59,7 +60,7 @@
   (setq c-offsets-alist (delq (assoc key c-offsets-alist) c-offsets-alist))
   (add-to-list 'c-offsets-alist '(key . val)))
 
-(when (string= system-type "darwin")
+(when is-mac
   (setq dired-use-ls-dired t
         insert-directory-program "gls"
         dired-listing-switches "-aBhl --group-directories-first"))
@@ -70,6 +71,7 @@
 (setq use-package-always-ensure t)
 
 (use-package exec-path-from-shell
+  :when is-mac
   :config
   (exec-path-from-shell-initialize))
 
@@ -79,7 +81,8 @@
   :config
   (load-theme 'gruvbox-dark-hard))
 
-(use-package magit)
+(use-package magit
+  :defer t)
 
 (use-package browse-kill-ring
   :bind (("C-M-y" . browse-kill-ring)))
@@ -96,6 +99,7 @@
   (keymap-set mc/keymap "<return>" nil))
 
 (use-package company
+  :diminish
   :config
   (global-company-mode 1))
 
@@ -123,9 +127,12 @@
   (keymap-unset sly-mode-map "M-,"))
 
 (use-package yasnippet
+  :diminish
+  :defer t
   :config
   (yas-global-mode 1))
-(use-package yasnippet-snippets)
+(use-package yasnippet-snippets
+  :after (yasnippet))
 
 (use-package evil
   :init
@@ -184,13 +191,18 @@
   (setq completion-styles '(orderless basic)
         completion-category-overrides '((file (styles basic partial-completion)))))
 
-(use-package org)
+(use-package org
+  :defer t)
 
-(use-package elixir-mode)
+(use-package elixir-mode
+  :defer t)
 
-(use-package ripgrep)
+(use-package ripgrep
+  :defer t)
 
-(use-package paredit)
+(use-package paredit
+  :diminish
+  :defer t)
 
 ;; (setf tree-sitter-module-path (concat (substring package-user-dir 0 (- (length package-user-dir) 4)) "tree-sitter-module"))
 ;; (when (not (file-directory-p tree-sitter-module-path))
@@ -198,7 +210,6 @@
 
 ;; setting up syntaxes documented here: https://git.savannah.gnu.org/cgit/emacs.git/tree/admin/notes/tree-sitter/starter-guide?h=feature/tree-sitter
 (setq treesit-extra-load-path '("~/src/github.com/casouri/tree-sitter-module/dist"))
-(require 'treesit)
 
 (setq completion-styles '(orderless basic)
       completion-category-overrides '((file (styles basic partial-completion))))
