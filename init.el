@@ -13,6 +13,7 @@
 ;; set custom settings
 (setq inhibit-startup-message t)
 (setq initial-scratch-message nil)
+(setq ring-bell-function 'ignore)
 (add-hook 'window-setup-hook 'toggle-frame-maximized t)
 (defalias 'yes-or-no-p 'y-or-n-p)
 (setq make-backup-files nil)
@@ -155,6 +156,10 @@
   (evil-define-key 'motion 'global (kbd "<leader>ff") #'find-file)
 
   (evil-define-key 'motion 'global (kbd "<leader>h") help-map)
+
+  (evil-define-key 'motion 'global (kbd "g]") #'flymake-goto-next-error)
+  (evil-define-key 'motion 'global (kbd "g[") #'flymake-goto-prev-error)
+  (evil-define-key 'motion 'global (kbd "ge") #'flymake-show-buffer-diagnostics)
 
 
   (evil-define-key 'motion 'emacs-lisp-mode-map (kbd "<localleader>e") #'eval-last-sexp)
