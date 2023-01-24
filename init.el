@@ -1,9 +1,9 @@
 ;; set up melpa
 (require 'package)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-(setq package-archive-priorities '(("melpa" . 10)
-				                   ("gnu" . 5)
-				                   ("nongnu" . 2)))
+
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                         ("org" . "https://orgmode.org/elpa/")
+                         ("elpa" . "https://elpa.gnu.org/packages/")))
 
 (setq gc-cons-threshold 100000000)
 (setq read-process-output-max (* 1024 1024))
@@ -84,6 +84,18 @@
 (use-package magit
   :defer t)
 
+(use-package org
+  :defer t
+  :hook (org-mode . org-indent-mode)
+  :init
+  (setq org-todo-keywords '((sequence "TODO" "INPROGRESS" "DONE"))))
+
+(use-package org-bullets
+  :after org
+  :hook (org-mode . org-bullets-mode)
+  :custom
+  (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+
 (use-package browse-kill-ring
   :bind (("C-M-y" . browse-kill-ring)))
 
@@ -139,6 +151,7 @@
   (setq evil-want-keybinding nil)
   (setq evil-move-beyond-eol t)
   (setq evil-want-C-u-scroll t)
+  (setq evil-undo-system 'undo-redo)
   :config
   (evil-mode 1)
   (evil-collection-init)
@@ -151,6 +164,7 @@
 
   (evil-define-key 'motion 'global (kbd "C-.") nil)
 
+  (evil-define-key 'motion 'global (kbd "<leader>SPC") #'project-find-file)
   (evil-define-key 'motion 'global (kbd "<leader>wh") #'evil-window-left)
   (evil-define-key 'motion 'global (kbd "<leader>wj") #'evil-window-down)
   (evil-define-key 'motion 'global (kbd "<leader>wk") #'evil-window-up)
@@ -158,6 +172,8 @@
   (evil-define-key 'motion 'global (kbd "<leader>wd") #'delete-window)
   (evil-define-key 'motion 'global (kbd "<leader>ws") #'split-window-below)
   (evil-define-key 'motion 'global (kbd "<leader>wv") #'split-window-right)
+
+  (evil-define-key 'motion 'global (kbd "<leader>bb") #'switch-to-buffer)
 
   (evil-define-key 'motion 'global (kbd "<leader>fs") #'save-buffer)
   (evil-define-key 'motion 'global (kbd "<leader>ff") #'find-file)
