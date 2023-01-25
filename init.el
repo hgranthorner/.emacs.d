@@ -110,6 +110,7 @@
   :hook ((org-mode . org-indent-mode)
          (org-mode . hgh/org-mode-setup))
   :init
+  (setq org-agenda-files '("~/notes/roam"))
   (setq org-todo-keywords '((sequence "TODO" "INPROGRESS" "DONE"))))
 
 
@@ -124,11 +125,17 @@
   :bind (("C-c n i" . org-roam-node-insert)
          ("C-c n f" . org-roam-node-find)
          ("C-c n t" . org-roam-buffer-toggle))
+  :bind-keymap
+  ("C-c n d" . org-roam-dailies-map)
+  :custom
+  (org-roam-directory (file-truename "~/notes/roam"))
+  (org-roam-dailies-directory "daily/")
+  (org-roam-complete-everywhere t)
   :init
   (unless (file-exists-p "~/notes")
     (make-directory "~/notes")
-    (make-directory "~/notes/roam"))
-  (setq org-roam-directory (file-truename "~/notes/roam"))
+    (make-directory "~/notes/roam")
+    (make-directory "~/notes/roam/daily"))
   (org-roam-db-autosync-mode 1))
 
 (use-package browse-kill-ring
