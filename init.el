@@ -114,10 +114,11 @@
   :bind (("C-M-y" . browse-kill-ring)))
 
 (use-package evil-mc
+  :after evil
   :bind
-  (("C->"   . #'evil-mc-make-and-goto-next-match)
-   ("C-<"   . #'evil-mc-make-and-goto-prev-match)
-   ("C-M->" . #'evil-mc-make-all-cursors))
+  (("C->"   . evil-mc-make-and-goto-next-match)
+   ("C-<"   . evil-mc-make-and-goto-prev-match)
+   ("C-M->" . evil-mc-make-all-cursors))
   :init
   (global-evil-mc-mode 1)
   :config
@@ -235,35 +236,30 @@
   :diminish
   :defer t)
 
-;; (setf tree-sitter-module-path (concat (substring package-user-dir 0 (- (length package-user-dir) 4)) "tree-sitter-module"))
-;; (when (not (file-directory-p tree-sitter-module-path))
-;;  (magit-clone-bare "https://github.com/casouri/tree-sitter-module.git" tree-sitter-module-path))
+(use-package eglot
+  :hook
+  ((clojure-mode       . eglot-ensure)
+   (go-mode            . eglot-ensure)
+   (rust-ts-mode       . eglot-ensure)
+   (typescript-ts-mode . eglot-ensure)
+   (elixir-ts-mode     . eglot-ensure)
+   (heex-ts-mode       . eglot-ensure)
+   (java-ts-mode       . eglot-ensure))
+  :bind
+  (:map eglot-mode-map
+    ("C-c r" . eglot-rename)
+    ("C-c a" . eglot-code-actions)
+    ("C-c f" . eglot-format-buffer)
+    ("C-c d" . xref-find-definitions))
+  :init
+  (setq eglot-events-buffer-size 0)
+  :config
+  ;; Set up using clippy with rust analyzer
+  (setf (cdr (assoc '(rust-ts-mode rust-mode) eglot-server-programs))
+        (list "rust-analyzer" :initializationOptions '(:checkOnSave (:command "clippy")))))
 
 ;; setting up syntaxes documented here: https://git.savannah.gnu.org/cgit/emacs.git/tree/admin/notes/tree-sitter/starter-guide?h=feature/tree-sitter
 (setq treesit-extra-load-path '("~/src/github.com/casouri/tree-sitter-module/dist"))
-
-(setq completion-styles '(orderless basic)
-      completion-category-overrides '((file (styles basic partial-completion))))
-
-(require 'eglot)
-(add-hook 'clojure-mode-hook       #'eglot-ensure)
-(add-hook 'go-mode-hook            #'eglot-ensure)
-(add-hook 'rust-ts-mode-hook       #'eglot-ensure)
-(add-hook 'typescript-ts-mode-hook #'eglot-ensure)
-(add-hook 'elixir-ts-mode-hook     #'eglot-ensure)
-(add-hook 'heex-ts-mode-hook       #'eglot-ensure)
-(add-hook 'java-ts-mode-hook       #'eglot-ensure)
-
-(setq eglot-events-buffer-size 0)
-;; Set up using clippy with rust analyzer
-(setf (cdr (assoc '(rust-ts-mode rust-mode) eglot-server-programs))
-      (list "rust-analyzer" :initializationOptions '(:checkOnSave (:command "clippy"))))
-
-(with-eval-after-load "eglot"
-  (define-key eglot-mode-map (kbd "C-c r") #'eglot-rename)
-  (define-key eglot-mode-map (kbd "C-c a") #'eglot-code-actions)
-  (define-key eglot-mode-map (kbd "C-c f") #'eglot-format-buffer)
-  (define-key eglot-mode-map (kbd "C-c d") #'xref-find-definitions))
 
 ;; paredit
 
