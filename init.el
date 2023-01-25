@@ -113,16 +113,15 @@
 (use-package browse-kill-ring
   :bind (("C-M-y" . browse-kill-ring)))
 
-(use-package multiple-cursors
-  :init
-  (setq mc/always-run-for-all t)
+(use-package evil-mc
   :bind
-  (("C-M->" .   mc/edit-lines)
-   ("C->" .     mc/mark-next-like-this)
-   ("C-<" .     mc/mark-previous-like-this)
-   ("C-c C->" . mc/mark-all-like-this))
+  (("C->"   . #'evil-mc-make-and-goto-next-match)
+   ("C-<"   . #'evil-mc-make-and-goto-prev-match)
+   ("C-M->" . #'evil-mc-make-all-cursors))
+  :init
+  (global-evil-mc-mode 1)
   :config
-  (keymap-set mc/keymap "<return>" nil))
+  (keymap-set evil-mc-key-map "C-g" #'evil-mc-undo-all-cursors))
 
 (use-package company
   :diminish

@@ -9,3 +9,5 @@ eshell
 url
 projectile*
 org-roam.db
+.org-id-locations
+bookmarks
