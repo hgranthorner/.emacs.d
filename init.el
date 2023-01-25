@@ -80,8 +80,7 @@
   :config
   (diminish 'abbrev-mode)
   (diminish 'evil-collection-unimpaired-mode)
-  (diminish 'auto-revert-mode)
-  (diminish 'which-key-mode))
+  (diminish 'auto-revert-mode))
 
 (use-package gruvbox-theme
   :config
@@ -91,6 +90,10 @@
 (use-package dracula-theme
   :config
   (load-theme 'dracula))
+
+(use-package mood-line
+  :config
+  (mood-line-mode))
 
 (use-package magit
   :defer t)
@@ -137,6 +140,7 @@
   (global-company-mode 1))
 
 (use-package which-key
+  :diminish
   :config
   (which-key-mode 1))
 
@@ -213,7 +217,8 @@
   (evil-define-key 'motion 'lisp-mode-map (kbd "<localleader>bb") #'paredit-backward-barf-sexp)
   (evil-define-key 'motion 'lisp-mode-map (kbd "<localleader>e") #'sly-eval-last-expression))
 
-(use-package evil-collection)
+(use-package evil-collection
+  :diminish evil-collection-unimpaired-mode)
 
 (use-package vertico
   :config
