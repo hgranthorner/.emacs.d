@@ -210,8 +210,10 @@
 (use-package org
   :defer t)
 
-(use-package elixir-mode
-  :defer t)
+(use-package elixir-ts-mode
+  :defer t
+  :config
+  (global-subword-mode 1))
 
 (use-package ripgrep
   :defer t)
@@ -231,10 +233,14 @@
       completion-category-overrides '((file (styles basic partial-completion))))
 
 (require 'eglot)
-(add-hook 'clojure-mode-hook #'eglot-ensure)
-(add-hook 'go-mode-hook      #'eglot-ensure)
-(add-hook 'rust-ts-mode-hook #'eglot-ensure)
-(add-hook 'elixir-mode-hook  #'eglot-ensure)
+(add-hook 'clojure-mode-hook       #'eglot-ensure)
+(add-hook 'go-mode-hook            #'eglot-ensure)
+(add-hook 'rust-ts-mode-hook       #'eglot-ensure)
+(add-hook 'typescript-ts-mode-hook #'eglot-ensure)
+(add-hook 'elixir-ts-mode-hook     #'eglot-ensure)
+(add-hook 'heex-ts-mode-hook       #'eglot-ensure)
+(add-hook 'java-ts-mode-hook       #'eglot-ensure)
+
 (setq eglot-events-buffer-size 0)
 ;; Set up using clippy with rust analyzer
 (setf (cdr (assoc '(rust-ts-mode rust-mode) eglot-server-programs))
