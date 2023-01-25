@@ -101,6 +101,15 @@
   :custom
   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 
+(use-package org-roam
+  :after org
+  :init
+  (unless (file-exists-p "~/notes")
+    (make-directory "~/notes")
+    (make-directory "~/notes/roam"))
+  (setq org-roam-directory (file-truename "~/notes/roam"))
+  (org-roam-db-autosync-mode 1))
+
 (use-package browse-kill-ring
   :bind (("C-M-y" . browse-kill-ring)))
 
