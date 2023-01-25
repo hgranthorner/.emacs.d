@@ -37,19 +37,19 @@
 (setq is-mac (string= system-type "darwin"))
 
 ;; key bindings
-(global-set-key (kbd "M-o")     #'other-window)
-(global-set-key (kbd "M-i")     #'imenu)
-(global-set-key (kbd "C-M-.")   #'end-of-buffer)
-(global-set-key (kbd "C-M-,")   #'beginning-of-buffer)
-(global-set-key (kbd "C-.")     #'xref-find-definitions)
-(global-set-key (kbd "C-,")     #'xref-go-back)
-(global-set-key (kbd "<f5>")    #'compile)
-(global-set-key (kbd "C-c r r") #'revert-buffer)
-(global-set-key (kbd "C-c C-c") #'comment-or-uncomment-region)
-(global-set-key (kbd "M-]")     #'forward-paragraph)
-(global-set-key (kbd "M-[")     #'backward-paragraph)
-(global-set-key (kbd "C-h h")   #'eldoc)
-(global-set-key (kbd "C-]")     #'flymake-goto-next-error)
+(keymap-global-set "M-o"     #'other-window)
+(keymap-global-set "M-i"     #'imenu)
+(keymap-global-set "C-M-."   #'end-of-buffer)
+(keymap-global-set "C-M-,"   #'beginning-of-buffer)
+(keymap-global-set "C-."     #'xref-find-definitions)
+(keymap-global-set "C-,"     #'xref-go-back)
+(keymap-global-set "<f5>"    #'compile)
+(keymap-global-set "C-c r r" #'revert-buffer)
+(keymap-global-set "C-c C-c" #'comment-or-uncomment-region)
+(keymap-global-set "M-]"     #'forward-paragraph)
+(keymap-global-set "M-["     #'backward-paragraph)
+(keymap-global-set "C-h h"   #'eldoc)
+(keymap-global-set "C-]"     #'flymake-goto-next-error)
 
 
 ;; Added for the defstar library in common lisp
@@ -75,7 +75,13 @@
   :config
   (exec-path-from-shell-initialize))
 
-(use-package diminish)
+(use-package diminish
+  :after (evil evil-collection which-key)
+  :config
+  (diminish 'abbrev-mode)
+  (diminish 'evil-collection-unimpaired-mode)
+  (diminish 'auto-revert-mode)
+  (diminish 'which-key-mode))
 
 (use-package gruvbox-theme
   :config
@@ -114,6 +120,7 @@
   :bind (("C-M-y" . browse-kill-ring)))
 
 (use-package evil-mc
+  :diminish
   :after evil
   :bind
   (("C->"   . evil-mc-make-and-goto-next-match)
@@ -211,6 +218,10 @@
 (use-package vertico
   :config
   (vertico-mode 1))
+
+(use-package savehist
+  :init
+  (savehist-mode))
 
 (use-package marginalia
   :config
