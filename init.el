@@ -79,7 +79,12 @@
 
 (use-package gruvbox-theme
   :config
-  (load-theme 'gruvbox-dark-hard))
+  ;(load-theme 'gruvbox-dark-hard)
+  )
+
+(use-package dracula-theme
+  :config
+  (load-theme 'dracula))
 
 (use-package magit
   :defer t)
