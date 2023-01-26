@@ -35,6 +35,9 @@
 (setq-default tab-width 4)
 (set-face-attribute 'default nil :height 160 :family "Ubuntu Mono")
 (setq is-mac (string= system-type "darwin"))
+(when (file-exists-p (file-truename "~/.asdf"))
+  (push (file-truename "~/.asdf/shims") exec-path)
+  (push (file-truename "~/.asdf/bin") exec-path))
 
 ;; key bindings
 (keymap-global-set "M-o"     #'other-window)
@@ -50,7 +53,7 @@
 (keymap-global-set "M-["     #'backward-paragraph)
 (keymap-global-set "C-h h"   #'eldoc)
 (keymap-global-set "C-]"     #'flymake-goto-next-error)
-
+(keymap-global-set "C-c e i" #'hgh/visit-init-file)
 
 ;; Added for the defstar library in common lisp
 (font-lock-add-keywords 'lisp-mode '("[[:word:]:]*def.*\\*"))
@@ -59,6 +62,10 @@
   "Fix c braces KEY VAL."
   (setq c-offsets-alist (delq (assoc key c-offsets-alist) c-offsets-alist))
   (add-to-list 'c-offsets-alist '(key . val)))
+
+(defun hgh/visit-init-file ()
+  (interactive)
+  (find-file user-init-file))
 
 (when is-mac
   (setq dired-use-ls-dired t
@@ -101,7 +108,7 @@
 (use-package mixed-pitch
   :hook
   ;; If you want it in all text modes:
-  (text-mode . mixed-pitch-mode))
+  (org-mode . mixed-pitch-mode))
 
 (use-package org
   :defer 1
@@ -128,14 +135,17 @@
   :bind-keymap
   ("C-c n d" . org-roam-dailies-map)
   :custom
-  (org-roam-directory (file-truename "~/notes/roam"))
-  (org-roam-dailies-directory "daily/")
   (org-roam-complete-everywhere t)
   :init
-  (unless (file-exists-p "~/notes")
+  (unless (and (file-exists-p "~/notes")
+               (file-exists-p "~/notes/roam")
+               (file-exists-p "~/notes/roam/daily"))
     (make-directory "~/notes")
     (make-directory "~/notes/roam")
     (make-directory "~/notes/roam/daily"))
+
+  (setq org-roam-directory (file-truename "~/notes/roam"))
+  (setq org-roam-dailies-directory "daily/")
   (org-roam-db-autosync-mode 1))
 
 (use-package browse-kill-ring
@@ -311,6 +321,12 @@
   :diminish
   :defer t)
 
+(use-package web-mode
+  :defer t
+  :init
+  (define-derived-mode svelte-mode web-mode "Svelte")
+  (add-to-list 'auto-mode-alist '("\.svelte" . svelte-mode)))
+
 (use-package eglot
   :hook
   ((clojure-mode       . eglot-ensure)
@@ -319,7 +335,8 @@
    (typescript-ts-mode . eglot-ensure)
    (elixir-ts-mode     . eglot-ensure)
    (heex-ts-mode       . eglot-ensure)
-   (java-ts-mode       . eglot-ensure))
+   (java-ts-mode       . eglot-ensure)
+   (svelte-mode        . eglot-ensure))
   :bind
   (:map eglot-mode-map
         ("C-c r" . eglot-rename)
@@ -331,7 +348,8 @@
   :config
   ;; Set up using clippy with rust analyzer
   (setf (cdr (assoc '(rust-ts-mode rust-mode) eglot-server-programs))
-        (list "rust-analyzer" :initializationOptions '(:checkOnSave (:command "clippy")))))
+        (list "rust-analyzer" :initializationOptions '(:checkOnSave (:command "clippy"))))
+  (setf eglot-server-programs (cons '(svelte-mode "svelteserver" "--stdio") eglot-server-programs)))
 
 ;; setting up syntaxes documented here: https://git.savannah.gnu.org/cgit/emacs.git/tree/admin/notes/tree-sitter/starter-guide?h=feature/tree-sitter
 (setq treesit-extra-load-path '("~/src/github.com/casouri/tree-sitter-module/dist"))
