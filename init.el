@@ -35,9 +35,20 @@
 (setq-default tab-width 4)
 (set-face-attribute 'default nil :height 160 :family "Ubuntu Mono")
 (setq is-mac (string= system-type "darwin"))
+
+; Add .asdf to exec-path
 (when (file-exists-p (file-truename "~/.asdf"))
   (push (file-truename "~/.asdf/shims") exec-path)
   (push (file-truename "~/.asdf/bin") exec-path))
+
+; Remove "/mnt/c/" for WSL PATH
+(setq exec-path
+      (cl-remove-if (lambda (s)
+                      (and (< 5 (length s))
+                           (string= (substring s 0 6) "/mnt/c")))
+                    exec-path))
+
+(setenv "PATH" (string-join exec-path ":"))
 
 ;; key bindings
 (keymap-global-set "M-o"     #'other-window)
@@ -57,11 +68,6 @@
 
 ;; Added for the defstar library in common lisp
 (font-lock-add-keywords 'lisp-mode '("[[:word:]:]*def.*\\*"))
-
-(defun hg/fix-c-indent-offset-according-to-syntax-context (key val)
-  "Fix c braces KEY VAL."
-  (setq c-offsets-alist (delq (assoc key c-offsets-alist) c-offsets-alist))
-  (add-to-list 'c-offsets-alist '(key . val)))
 
 (defun hgh/visit-init-file ()
   (interactive)
@@ -113,12 +119,17 @@
 (use-package org
   :defer 1
   :pin org
+  :bind (:map org-agenda-keymap
+              ("j" . org-agenda-next-line)
+              ("k" . org-agenda-previous-line))
   :commands (org-capture org-agenda)
   :hook ((org-mode . org-indent-mode)
          (org-mode . hgh/org-mode-setup))
-  :init
-  (setq org-agenda-files '("~/notes/roam"))
-  (setq org-todo-keywords '((sequence "TODO" "INPROGRESS" "DONE"))))
+  :custom
+  (org-agenda-files '("~/notes/roam"))
+  (org-todo-keywords '((sequence "TODO" "INPROGRESS" "DONE")))
+  (org-log-done 'time)
+  (org-log-into-drawer t))
 
 
 (use-package org-bullets
@@ -166,7 +177,14 @@
 (use-package company
   :diminish
   :config
-  (global-company-mode 1))
+  (global-company-mode 0))
+
+(use-package corfu
+  :custom
+  (corfu-auto t)
+  (corfu-cycle t)
+  :config
+  (global-corfu-mode 1))
 
 (use-package which-key
   :diminish
@@ -201,11 +219,11 @@
   :after (yasnippet))
 
 (use-package evil
-  :init
-  (setq evil-want-keybinding nil)
-  (setq evil-move-beyond-eol t)
-  (setq evil-want-C-u-scroll t)
-  (setq evil-undo-system 'undo-redo)
+  :custom
+  (evil-want-keybinding nil)
+  (evil-move-beyond-eol t)
+  (evil-want-C-u-scroll t)
+  (evil-undo-system 'undo-redo)
   :config
   (evil-mode 1)
   (evil-collection-init)
@@ -226,6 +244,7 @@
   (evil-define-key 'motion 'global (kbd "<leader>wd") #'delete-window)
   (evil-define-key 'motion 'global (kbd "<leader>ws") #'split-window-below)
   (evil-define-key 'motion 'global (kbd "<leader>wv") #'split-window-right)
+  (evil-define-key 'motion 'global (kbd "K")          #'eldoc)
 
   (evil-define-key 'motion 'global (kbd "<leader>bb") #'switch-to-buffer)
 
@@ -250,6 +269,8 @@
   :diminish evil-collection-unimpaired-mode)
 
 (use-package vertico
+  :custom
+  (vertico-cycle t)
   :config
   (vertico-mode 1))
 
@@ -273,11 +294,11 @@
                              (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
   ;; Set faces for heading levels
-  (dolist (face '((org-level-1 . 1.2)
-                  (org-level-2 . 1.1)
+  (dolist (face '((org-level-1 . 1.1)
+                  (org-level-2 . 1.75)
                   (org-level-3 . 1.05)
-                  (org-level-4 . 1.0)
-                  (org-level-5 . 1.1)
+                  (org-level-4 . 1.25)
+                  (org-level-5 . 1.0)
                   (org-level-6 . 1.1)
                   (org-level-7 . 1.1)
                   (org-level-8 . 1.1)))
@@ -329,14 +350,14 @@
 
 (use-package eglot
   :hook
-  ((clojure-mode       . eglot-ensure)
-   (go-mode            . eglot-ensure)
-   (rust-ts-mode       . eglot-ensure)
-   (typescript-ts-mode . eglot-ensure)
-   (elixir-ts-mode     . eglot-ensure)
-   (heex-ts-mode       . eglot-ensure)
-   (java-ts-mode       . eglot-ensure)
-   (svelte-mode        . eglot-ensure))
+  ((clojure-mode            . eglot-ensure)
+   (go-mode                 . eglot-ensure)
+   (rust-ts-mode            . eglot-ensure)
+   (typescript-ts-base-mode . eglot-ensure)
+   (elixir-ts-mode          . eglot-ensure)
+   (heex-ts-mode            . eglot-ensure)
+   (java-ts-mode            . eglot-ensure)
+   (svelte-mode             . eglot-ensure))
   :bind
   (:map eglot-mode-map
         ("C-c r" . eglot-rename)
