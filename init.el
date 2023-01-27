@@ -1,14 +1,22 @@
-;; set up melpa
-(require 'package)
+;; set up straight
+(defvar bootstrap-version)
+(setq straight-use-package-by-default t)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 6))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                         ("org" . "https://orgmode.org/elpa/")
-                         ("elpa" . "https://elpa.gnu.org/packages/")))
+(straight-use-package 'use-package)
 
 (setq gc-cons-threshold 100000000)
 (setq read-process-output-max (* 1024 1024))
-
-(package-initialize)
 
 ;; set custom settings
 (setq inhibit-startup-message t)
@@ -18,6 +26,8 @@
 (defalias 'yes-or-no-p 'y-or-n-p)
 (setq make-backup-files nil)
 (setq custom-file (concat user-emacs-directory "custom.el"))
+(unless (file-exists-p custom-file)
+  (make-empty-file custom-file))
 (load custom-file)
 (setq mac-command-modifier 'ctrl)
 (scroll-bar-mode -1)
@@ -118,10 +128,6 @@
 
 (use-package org
   :defer 1
-  :pin org
-  :bind (:map org-agenda-keymap
-              ("j" . org-agenda-next-line)
-              ("k" . org-agenda-previous-line))
   :commands (org-capture org-agenda)
   :hook ((org-mode . org-indent-mode)
          (org-mode . hgh/org-mode-setup))
@@ -129,7 +135,11 @@
   (org-agenda-files '("~/notes/roam"))
   (org-todo-keywords '((sequence "TODO" "INPROGRESS" "DONE")))
   (org-log-done 'time)
-  (org-log-into-drawer t))
+  (org-log-into-drawer t)
+  :config
+  (require 'org-agenda)
+  (keymap-set org-agenda-mode-map "j" #'org-agenda-next-line)
+  (keymap-set org-agenda-mode-map "k" #'org-agenda-previous-line))
 
 
 (use-package org-bullets
@@ -139,6 +149,7 @@
   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 
 (use-package org-roam
+  :demand t
   :after org
   :bind (("C-c n i" . org-roam-node-insert)
          ("C-c n f" . org-roam-node-find)
@@ -226,7 +237,7 @@
   (evil-undo-system 'undo-redo)
   :config
   (evil-mode 1)
-  (evil-collection-init)
+
   (setq evil-leader "SPC")
   (evil-set-leader 'motion (kbd evil-leader))
   (evil-set-leader 'motion (kbd ",") 'local)
@@ -266,7 +277,10 @@
   (evil-define-key 'motion 'lisp-mode-map (kbd "<localleader>e") #'sly-eval-last-expression))
 
 (use-package evil-collection
-  :diminish evil-collection-unimpaired-mode)
+  :after (evil)
+  :diminish evil-collection-unimpaired-mode
+  :config
+  (evil-collection-init))
 
 (use-package vertico
   :custom
