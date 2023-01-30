@@ -46,8 +46,12 @@
 (set-face-attribute 'default nil :height 160 :family "Ubuntu Mono")
 (setq is-mac (string= system-type "darwin"))
 
+(setq env-changed nil)
+(require 'treesit)
+
 ; Add .asdf to exec-path
 (when (file-exists-p (file-truename "~/.asdf"))
+  (setq env-changed t)
   (push (file-truename "~/.asdf/shims") exec-path)
   (push (file-truename "~/.asdf/bin") exec-path))
 
@@ -55,10 +59,12 @@
 (setq exec-path
       (cl-remove-if (lambda (s)
                       (and (< 5 (length s))
-                           (string= (substring s 0 6) "/mnt/c")))
+                           (string= (substring s 0 6) "/mnt/c")
+                           (setq env-changed t)))
                     exec-path))
 
-(setenv "PATH" (string-join exec-path ":"))
+(when exec-path
+  (setenv "PATH" (string-join exec-path ":")))
 
 ;; key bindings
 (keymap-global-set "M-o"     #'other-window)
@@ -106,8 +112,8 @@
   (diminish 'auto-revert-mode))
 
 (use-package gruvbox-theme
-  :config
-  ;(load-theme 'gruvbox-dark-hard)
+  ; :config
+  ; (load-theme 'gruvbox-dark-hard)
   )
 
 (use-package dracula-theme
@@ -159,11 +165,13 @@
   :custom
   (org-roam-complete-everywhere t)
   :init
-  (unless (and (file-exists-p "~/notes")
-               (file-exists-p "~/notes/roam")
-               (file-exists-p "~/notes/roam/daily"))
-    (make-directory "~/notes")
-    (make-directory "~/notes/roam")
+  (unless (file-exists-p "~/notes")
+    (make-directory "~/notes"))
+
+  (unless (file-exists-p "~/notes/roam")
+    (make-directory "~/notes/roam"))
+
+  (unless (file-exists-p "~/notes/roam/daily")
     (make-directory "~/notes/roam/daily"))
 
   (setq org-roam-directory (file-truename "~/notes/roam"))
