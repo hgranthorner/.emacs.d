@@ -390,8 +390,11 @@
   (setq eglot-events-buffer-size 0)
   :config
   ;; Set up using clippy with rust analyzer
-  (setf (cdr (assoc '(rust-ts-mode rust-mode) eglot-server-programs))
-        (list "rust-analyzer" :initializationOptions '(:checkOnSave (:command "clippy"))))
+  (let ((rust-program '("rust-analyzer" :initializationOptions '(:checkOnSave (:command "clippy")))))
+    (if (assoc '(rust-ts-mode rust-mode) eglot-server-programs)
+        (setf (cdr (assoc '(rust-ts-mode rust-mode) eglot-server-programs)) rust-program)
+      (setf (cdr (assoc 'rust-mode eglot-server-programs)) rust-program)))
+
   (setf eglot-server-programs (cons '(svelte-mode "svelteserver" "--stdio") eglot-server-programs)))
 
 ;; setting up syntaxes documented here: https://git.savannah.gnu.org/cgit/emacs.git/tree/admin/notes/tree-sitter/starter-guide?h=feature/tree-sitter
