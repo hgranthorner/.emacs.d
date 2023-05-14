@@ -104,6 +104,9 @@
   :config
   (exec-path-from-shell-initialize))
 
+(use-package project
+  :bind (("C-x p s" . hgh/project-ripgrep)
+         ("C-x p S" . project-shell)))
 (use-package diminish
   :after (evil evil-collection which-key)
   :config
@@ -308,6 +311,10 @@
   :init
   (setq completion-styles '(orderless basic)
         completion-category-overrides '((file (styles basic partial-completion)))))
+
+(defun hgh/project-ripgrep (regexp)
+  (interactive (list (read-from-minibuffer "Search (regexp): " (thing-at-point 'symbol))))
+  (ripgrep-regexp regexp (project-root (project-current))))
 
 (defun hgh/org-font-setup ()
   ;; Replace list hyphen with dot
