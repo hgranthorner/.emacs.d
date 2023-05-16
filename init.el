@@ -1,24 +1,57 @@
-;; set up straight
-(defvar bootstrap-version)
-(setq straight-use-package-by-default t)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 6))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
+;; load elpaca
+(defvar elpaca-installer-version 0.4)
+(defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
+(defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
+(defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
+(defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
+                              :ref nil
+                              :files (:defaults (:exclude "extensions"))
+                              :build (:not elpaca--activate-package)))
+(let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
+       (build (expand-file-name "elpaca/" elpaca-builds-directory))
+       (order (cdr elpaca-order))
+       (default-directory repo))
+  (add-to-list 'load-path (if (file-exists-p build) build repo))
+  (unless (file-exists-p repo)
+    (make-directory repo t)
+    (when (< emacs-major-version 28) (require 'subr-x))
+    (condition-case-unless-debug err
+        (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                 ((zerop (call-process "git" nil buffer t "clone"
+                                       (plist-get order :repo) repo)))
+                 ((zerop (call-process "git" nil buffer t "checkout"
+                                       (or (plist-get order :ref) "--"))))
+                 (emacs (concat invocation-directory invocation-name))
+                 ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                                       "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                 ((require 'elpaca))
+                 ((elpaca-generate-autoloads "elpaca" repo)))
+            (kill-buffer buffer)
+          (error "%s" (with-current-buffer buffer (buffer-string))))
+      ((error) (warn "%s" err) (delete-directory repo 'recursive))))
+  (unless (require 'elpaca-autoloads nil t)
+    (require 'elpaca)
+    (elpaca-generate-autoloads "elpaca" repo)
+    (load "./elpaca-autoloads")))
+(add-hook 'after-init-hook #'elpaca-process-queues)
+(elpaca `(,@elpaca-order))
 
-(straight-use-package 'use-package)
+;; Install use-package support
+(elpaca elpaca-use-package
+  ;; Enable :elpaca use-package keyword.
+  (elpaca-use-package-mode)
+  ;; Assume :elpaca t unless otherwise specified.
+  (setq elpaca-use-package-by-default t))
+
+(elpaca-wait)
 
 (setq gc-cons-threshold 100000000)
 (setq read-process-output-max (* 1024 1024))
 
+(load-theme 'modus-vivendi-tinted t)
+
 ;; set custom settings
+(setq tab-bar-show nil)
 (setq inhibit-startup-message t)
 (setq initial-scratch-message nil)
 (setq ring-bell-function 'ignore)
@@ -49,13 +82,13 @@
 (setq env-changed nil)
 (require 'treesit)
 
-; Add .asdf to exec-path
+;; Add .asdf to exec-path
 (when (file-exists-p (file-truename "~/.asdf"))
   (setq env-changed t)
   (push (file-truename "~/.asdf/shims") exec-path)
   (push (file-truename "~/.asdf/bin") exec-path))
 
-; Remove "/mnt/c/" for WSL PATH
+;; Remove "/mnt/c/" for WSL PATH
 (setq exec-path
       (cl-remove-if (lambda (s)
                       (and (< 5 (length s))
@@ -114,14 +147,7 @@
   (diminish 'evil-collection-unimpaired-mode)
   (diminish 'auto-revert-mode))
 
-(use-package gruvbox-theme
-  ; :config
-  ; (load-theme 'gruvbox-dark-hard)
-  )
-
-(use-package dracula-theme
-  :config
-  (load-theme 'dracula))
+(use-package haskell-mode)
 
 (use-package mood-line
   :config
@@ -300,6 +326,7 @@
   (vertico-mode 1))
 
 (use-package savehist
+  :elpaca nil
   :init
   (savehist-mode))
 
@@ -386,7 +413,8 @@
    (elixir-ts-mode          . eglot-ensure)
    (heex-ts-mode            . eglot-ensure)
    (java-ts-mode            . eglot-ensure)
-   (svelte-mode             . eglot-ensure))
+   (svelte-mode             . eglot-ensure)
+   (haskell-mode            . eglot-ensure))
   :bind
   (:map eglot-mode-map
         ("C-c r" . eglot-rename)
@@ -397,12 +425,18 @@
   (setq eglot-events-buffer-size 0)
   :config
   ;; Set up using clippy with rust analyzer
-  (let ((rust-program '("rust-analyzer" :initializationOptions '(:checkOnSave (:command "clippy")))))
-    (if (assoc '(rust-ts-mode rust-mode) eglot-server-programs)
-        (setf (cdr (assoc '(rust-ts-mode rust-mode) eglot-server-programs)) rust-program)
-      (setf (cdr (assoc 'rust-mode eglot-server-programs)) rust-program)))
+  (setf eglot-server-programs
+        (cl-remove-if (lambda (c) (equal (car c) 'rust-mode))
+                      eglot-server-programs))
 
-  (setf eglot-server-programs (cons '(svelte-mode "svelteserver" "--stdio") eglot-server-programs)))
+  (setf eglot-server-programs (cons (list '(rust-ts-mode rust-mode) "rust-analyzer" :initializationOptions '(:checkOnSave (:command "clippy")))
+                                    eglot-server-programs))
+
+  (setf eglot-server-programs (cons '(svelte-mode "svelteserver" "--stdio")
+                                    eglot-server-programs))
+
+  (setf eglot-server-programs (cons '(haskell-mode "haskell-language-server-wrapper" "--lsp")
+                                    eglot-server-programs)))
 
 ;; setting up syntaxes documented here: https://git.savannah.gnu.org/cgit/emacs.git/tree/admin/notes/tree-sitter/starter-guide?h=feature/tree-sitter
 (setq treesit-extra-load-path '("~/src/github.com/casouri/tree-sitter-module/dist"))
@@ -411,7 +445,7 @@
 
 (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
 
-(with-eval-after-load "paredit"
+(defun setup-paredit ()
   (setcdr paredit-mode-map nil)
   (define-key paredit-mode-map (kbd "M-.") #'paredit-forward-slurp-sexp)
   (define-key paredit-mode-map (kbd "M-,") #'paredit-backward-slurp-sexp)
@@ -429,4 +463,5 @@
 (add-hook 'lisp-mode-hook
           (lambda ()
             (set (make-local-variable 'lisp-indent-function)
-                 'common-lisp-indent-function)))
+                 'common-lisp-indent-function)
+            (setup-paredit)))
