@@ -116,6 +116,9 @@
 (keymap-global-set "C-]"     #'flymake-goto-next-error)
 (keymap-global-set "C-c e i" #'hgh/visit-init-file)
 
+;; set up auto-mode-alist
+(add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-ts-mode))
+
 ;; Added for the defstar library in common lisp
 (font-lock-add-keywords 'lisp-mode '("[[:word:]:]*def.*\\*"))
 
@@ -482,24 +485,23 @@
 ;; paredit
 
 (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
-
 (defun setup-paredit ()
   (setcdr paredit-mode-map nil)
   (define-key paredit-mode-map (kbd "M-.") #'paredit-forward-slurp-sexp)
   (define-key paredit-mode-map (kbd "M-,") #'paredit-backward-slurp-sexp)
   (define-key paredit-mode-map (kbd "M->") #'paredit-forward-barf-sexp)
-  (define-key paredit-mode-map (kbd "M-<") #'paredit-backward-barf-sexp))
+  (define-key paredit-mode-map (kbd "M-<") #'paredit-backward-barf-sexp)
+  (enable-paredit-mode))
 
 (setq lisp-mode-hooks '((emacs-lisp-mode-hook emacs-lisp-mode)
                         (clojure-mode-hook clojure-mode)
                         (lisp-mode-hook lisp-mode)
                         (sly-mode-hook sly-mode)))
 
-(dolist (hook lisp-mode-hooks)
-  (add-hook (car hook) #'enable-paredit-mode))
-
 (add-hook 'lisp-mode-hook
           (lambda ()
             (set (make-local-variable 'lisp-indent-function)
                  'common-lisp-indent-function)
             (setup-paredit)))
+
+(use-package haskell-mode)
