@@ -78,6 +78,7 @@
 (setq-default tab-width 4)
 (set-face-attribute 'default nil :height 160 :family "Ubuntu Mono")
 (setq is-mac (string= system-type "darwin"))
+(setq use-evil nil)
 
 (setq env-changed nil)
 (require 'treesit)
@@ -127,6 +128,8 @@
         insert-directory-program "gls"
         dired-listing-switches "-aBhl --group-directories-first"))
 
+(add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)
+
 (require 'use-package)
 (require 'use-package-ensure)
 (require 'bind-key)
@@ -140,6 +143,7 @@
 (use-package project
   :bind (("C-x p s" . hgh/project-ripgrep)
          ("C-x p S" . project-shell)))
+
 (use-package diminish
   :after (evil evil-collection which-key)
   :config
@@ -167,7 +171,6 @@
   (org-mode . mixed-pitch-mode))
 
 (use-package org
-  :defer 1
   :commands (org-capture org-agenda)
   :hook ((org-mode . org-indent-mode)
          (org-mode . hgh/org-mode-setup))
@@ -181,6 +184,24 @@
   (keymap-set org-agenda-mode-map "j" #'org-agenda-next-line)
   (keymap-set org-agenda-mode-map "k" #'org-agenda-previous-line))
 
+(use-package diminish
+  :after (evil evil-collection which-key)
+  :config
+  (diminish 'abbrev-mode)
+  (diminish 'evil-collection-unimpaired-mode)
+  (diminish 'auto-revert-mode))
+
+(use-package mood-line
+  :config
+  (mood-line-mode))
+
+(use-package magit
+  :defer t)
+
+(use-package mixed-pitch
+  :hook
+  ;; If you want it in all text modes:
+  (org-mode . mixed-pitch-mode))
 
 (use-package org-bullets
   :after org
@@ -220,6 +241,7 @@
 
 (use-package evil-mc
   :diminish
+  :if use-evil
   :after evil
   :bind
   (("C->"   . evil-mc-make-and-goto-next-match)
@@ -271,10 +293,18 @@
   :defer t
   :config
   (yas-global-mode 1))
+
 (use-package yasnippet-snippets
   :after (yasnippet))
 
+(use-package multiple-cursors
+  :if (not use-evil)
+  :config
+  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this))
+
 (use-package evil
+  :if use-evil
   :custom
   (evil-want-keybinding nil)
   (evil-move-beyond-eol t)
@@ -322,6 +352,7 @@
   (evil-define-key 'motion 'lisp-mode-map (kbd "<localleader>e") #'sly-eval-last-expression))
 
 (use-package evil-collection
+  :if use-evil
   :after (evil)
   :diminish evil-collection-unimpaired-mode
   :config
@@ -383,7 +414,6 @@
 
 (defun hgh/org-mode-setup ()
   (org-indent-mode)
-  (variable-pitch-mode 1)
   (visual-line-mode 1))
 
 (defun hgh/org-mode-visual-fill ()
