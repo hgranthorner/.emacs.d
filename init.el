@@ -149,6 +149,11 @@
 
 (use-package haskell-mode)
 
+(load (concat user-emacs-directory "hindent.el"))
+(require 'hindent)
+(add-hook 'haskell-mode-hook #'hindent-mode)
+(keymap-set hindent-mode-map "C-M-|" #'hindent-reformat-buffer)
+
 (use-package mood-line
   :config
   (mood-line-mode))
@@ -209,6 +214,9 @@
 
 (use-package browse-kill-ring
   :bind (("C-M-y" . browse-kill-ring)))
+
+(use-package ace-window
+  :bind (("M-O" . ace-window)))
 
 (use-package evil-mc
   :diminish
